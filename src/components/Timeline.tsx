@@ -192,7 +192,7 @@ function Timeline() {
 
       {/* Footer hint */}
       <div className="px-4 py-2 border-t border-yellow-100 text-xs text-gray-500 text-center">
-        Double-click to create record | Click block to edit | Alt + Wheel to zoom
+        Double-click to create | Click to edit | Drag to move | Drag edges to resize
       </div>
 
       {/* Record Modal */}
