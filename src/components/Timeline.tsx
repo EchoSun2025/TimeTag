@@ -90,8 +90,8 @@ function Timeline() {
     setIsModalOpen(true);
   };
 
-  // Handle time block click
-  const handleBlockClick = (record: TimeRecord) => {
+  // Handle time block double-click to edit
+  const handleBlockEdit = (record: TimeRecord) => {
     setEditingRecord(record);
     setModalStartTime(undefined);
     setModalEndTime(undefined);
@@ -183,7 +183,7 @@ function Timeline() {
                 tags={tags}
                 heightPerHour={heightPerHour}
                 dayStart={dayStartTimestamp}
-                onClick={() => handleBlockClick(record)}
+                onEdit={() => handleBlockEdit(record)}
               />
             ))}
           </div>
@@ -192,7 +192,7 @@ function Timeline() {
 
       {/* Footer hint */}
       <div className="px-4 py-2 border-t border-yellow-100 text-xs text-gray-500 text-center">
-        Double-click to create | Click to edit | Drag to move | Drag edges to resize
+        Double-click empty space to create | Double-click block to edit | Drag to move | Drag edges to resize
       </div>
 
       {/* Record Modal */}

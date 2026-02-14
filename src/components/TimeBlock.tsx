@@ -8,17 +8,18 @@ interface TimeBlockProps {
   tags: Tag[];
   heightPerHour: number;
   dayStart: number;
-  onClick: () => void;
+  onEdit: () => void;
 }
 
 type DragMode = 'none' | 'move' | 'resize-top' | 'resize-bottom';
 
-function TimeBlock({ record, tags, heightPerHour, dayStart, onClick }: TimeBlockProps) {
+function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit }: TimeBlockProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragMode, setDragMode] = useState<DragMode>('none');
   const dragStartY = useRef(0);
   const initialStartTime = useRef(0);
   const initialEndTime = useRef(0);
+  const hasDragged = useRef(false);
 
   const startTime = new Date(record.startTime).getTime();
   const endTime = new Date(record.endTime).getTime();
@@ -46,9 +47,16 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onClick }: TimeBlock
     dragStartY.current = e.clientY;
     initialStartTime.current = startTime;
     initialEndTime.current = endTime;
+    hasDragged.current = false;
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       const deltaY = moveEvent.clientY - dragStartY.current;
+      
+      // Mark as dragged if moved more than 5 pixels
+      if (Math.abs(deltaY) > 5) {
+        hasDragged.current = true;
+      }
+
       const deltaMinutes = Math.round((deltaY / heightPerHour) * 60);
 
       let newStartTime = initialStartTime.current;
@@ -98,9 +106,10 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onClick }: TimeBlock
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (!isDragging && dragMode === 'none') {
-      onClick();
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!hasDragged.current) {
+      onEdit();
     }
   };
   
@@ -129,7 +138,7 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onClick }: TimeBlock
           borderColor,
         }}
         onMouseDown={(e) => handleMouseDown(e, 'move')}
-        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
       >
         {/* Time range */}
         <div className="text-xs font-medium opacity-80 pointer-events-none">
