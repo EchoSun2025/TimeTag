@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAppStore } from '@/stores/appStore';
 
 function Timeline() {
   const { timelineZoom, setTimelineZoom } = useAppStore();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleZoomIn = () => setTimelineZoom(timelineZoom + 1);
   const handleZoomOut = () => setTimelineZoom(timelineZoom - 1);
@@ -18,14 +19,21 @@ function Timeline() {
     }
   };
 
-  // Generate hour labels from 8am to 9pm (default view)
-  const startHour = 8;
-  const endHour = 21;
-  const hours = Array.from({ length: endHour - startHour + 1 }, (_, i) => startHour + i);
+  // Generate full 24 hours (0-23)
+  const hours = Array.from({ length: 24 }, (_, i) => i);
 
   // Calculate height based on zoom (zoom 1-5, base 40px per hour)
   const baseHeightPerHour = 40;
   const heightPerHour = baseHeightPerHour * timelineZoom;
+
+  // Scroll to 8am by default on mount
+  useEffect(() => {
+    if (containerRef.current) {
+      const defaultStartHour = 8;
+      const scrollPosition = defaultStartHour * heightPerHour;
+      containerRef.current.scrollTop = scrollPosition;
+    }
+  }, []); // Only run once on mount
 
   return (
     <div className="h-full flex flex-col bg-yellow-50 relative">
@@ -51,14 +59,15 @@ function Timeline() {
 
       {/* Timeline content */}
       <div
+        ref={containerRef}
         className="flex-1 overflow-y-auto scrollbar-hide relative pt-4"
         onWheel={handleWheel}
       >
         <div className="relative">
-          {/* Hour grid */}
+          {/* Hour grid - Full 24 hours */}
           {hours.map((hour) => {
             const is12h = hour > 12;
-            const displayHour = is12h ? hour - 12 : hour;
+            const displayHour = hour === 0 ? 12 : (is12h ? hour - 12 : hour);
             const period = hour >= 12 ? 'pm' : 'am';
 
             return (
@@ -69,7 +78,7 @@ function Timeline() {
               >
                 {/* Hour label */}
                 <div className="absolute left-0 top-0 -mt-2 ml-2 text-xs text-gray-500">
-                  {displayHour === 0 ? 12 : displayHour}:{String(0).padStart(2, '0')}
+                  {displayHour}:{String(0).padStart(2, '0')}
                   {period}
                 </div>
 
@@ -105,7 +114,7 @@ function Timeline() {
 
       {/* Footer hint */}
       <div className="px-4 py-2 border-t border-yellow-100 text-xs text-gray-500 text-center">
-        Double-click to create record | Alt + Wheel to zoom
+        Double-click to create record | Alt + Wheel to zoom | Scroll to view full day (0-24h)
       </div>
     </div>
   );
