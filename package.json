@@ -1,0 +1,82 @@
+{
+  "name": "timetag",
+  "version": "1.0.0",
+  "description": "A minimalist time tracking application with timeline visualization",
+  "main": "dist-electron/main.js",
+  "author": "Your Name",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "build:win": "npm run build:renderer && npm run build:electron && electron-builder --win portable",
+    "build:linux": "npm run build:renderer && npm run build:electron && electron-builder --linux AppImage",
+    "build:all": "npm run build:renderer && npm run build:electron && electron-builder --win portable --linux AppImage",
+    "build:renderer": "vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.0",
+    "dexie": "^4.0.1",
+    "dexie-react-hooks": "^1.1.7",
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/sortable": "^8.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "date-fns": "^3.3.1",
+    "clsx": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^28.2.0",
+    "electron-builder": "^24.13.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.4.2",
+    "vite": "^5.1.4",
+    "vite-plugin-electron": "^0.28.6",
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1"
+  },
+  "build": {
+    "appId": "com.timetag.app",
+    "productName": "TimeTag",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "dist/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "${productName}-${version}-Portable.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
+      "category": "Utility",
+      "artifactName": "${productName}-${version}.${ext}"
+    }
+  }
+}
