@@ -37,8 +37,69 @@ function Timeline() {
     return calculateOverlappingLayout(records);
   }, [records]);
 
-  const handleZoomIn = () => setTimelineZoom(timelineZoom + 1);
-  const handleZoomOut = () => setTimelineZoom(timelineZoom - 1);
+  const handleZoomIn = () => {
+    if (timelineZoom >= 5 || !containerRef.current) return;
+    
+    // Get viewport center
+    const rect = containerRef.current.getBoundingClientRect();
+    const scrollTop = containerRef.current.scrollTop;
+    const viewportHeight = rect.height;
+    const centerY = scrollTop + viewportHeight / 2 - 16; // Subtract padding
+    
+    // Calculate the hour position at viewport center
+    const oldHeightPerHour = baseHeightPerHour * timelineZoom;
+    const centerHourPosition = centerY / oldHeightPerHour;
+    
+    // Calculate new height per hour
+    const newZoom = timelineZoom + 1;
+    const newHeightPerHour = baseHeightPerHour * newZoom;
+    
+    // Calculate new scroll position to keep center fixed
+    const newCenterY = centerHourPosition * newHeightPerHour;
+    const newScrollTop = newCenterY - viewportHeight / 2 + 16; // Add padding back
+    
+    // Update zoom
+    setTimelineZoom(newZoom);
+    
+    // Update scroll position after render
+    setTimeout(() => {
+      if (containerRef.current) {
+        containerRef.current.scrollTop = newScrollTop;
+      }
+    }, 0);
+  };
+
+  const handleZoomOut = () => {
+    if (timelineZoom <= 1 || !containerRef.current) return;
+    
+    // Get viewport center
+    const rect = containerRef.current.getBoundingClientRect();
+    const scrollTop = containerRef.current.scrollTop;
+    const viewportHeight = rect.height;
+    const centerY = scrollTop + viewportHeight / 2 - 16; // Subtract padding
+    
+    // Calculate the hour position at viewport center
+    const oldHeightPerHour = baseHeightPerHour * timelineZoom;
+    const centerHourPosition = centerY / oldHeightPerHour;
+    
+    // Calculate new height per hour
+    const newZoom = timelineZoom - 1;
+    const newHeightPerHour = baseHeightPerHour * newZoom;
+    
+    // Calculate new scroll position to keep center fixed
+    const newCenterY = centerHourPosition * newHeightPerHour;
+    const newScrollTop = newCenterY - viewportHeight / 2 + 16; // Add padding back
+    
+    // Update zoom
+    setTimelineZoom(newZoom);
+    
+    // Update scroll position after render
+    setTimeout(() => {
+      if (containerRef.current) {
+        containerRef.current.scrollTop = newScrollTop;
+      }
+    }, 0);
+  };
 
   const handleWheel = (e: React.WheelEvent) => {
     if (e.altKey && containerRef.current) {
