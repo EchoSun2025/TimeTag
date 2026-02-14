@@ -62,17 +62,17 @@ function WeekOverview() {
           </button>
         </div>
 
-        {/* Combined 5/7 Days and Expand button - outside with deeper yellow background */}
-        <div className="flex bg-yellow-100 border border-yellow-300 rounded-full overflow-hidden divide-x divide-yellow-300">
+        {/* Combined 5/7 Days and Expand button - outside with lighter yellow background */}
+        <div className="flex bg-yellow-50/50 border border-yellow-200 rounded-full overflow-hidden divide-x divide-yellow-200">
           <button
             onClick={toggleWeekDays}
-            className="px-6 py-2.5 text-base hover:bg-yellow-200 transition-colors"
+            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors"
           >
             {weekDaysCount} Days
           </button>
           <button
             onClick={() => setShowWeekExpanded(!showWeekExpanded)}
-            className="px-6 py-2.5 text-base hover:bg-yellow-200 transition-colors"
+            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors"
           >
             {showWeekExpanded ? 'Mini Timeline' : 'Expand'}
           </button>
