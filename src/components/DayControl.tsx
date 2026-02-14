@@ -1,10 +1,56 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useAppStore } from '@/stores/appStore';
+import { db } from '@/lib/db';
 import { formatDate } from '@/lib/utils';
+import { calculateDayStats, formatMinutesToHM } from '@/lib/stats';
 
 function DayControl() {
   const { currentDate, setCurrentDate } = useAppStore();
-  const [showDetails, setShowDetails] = useState(false);
+
+  // Fetch records for current date
+  const records = useLiveQuery(async () => {
+    const dayStart = new Date(currentDate);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(currentDate);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    return await db.records
+      .where('startTime')
+      .between(dayStart, dayEnd, true, true)
+      .toArray();
+  }, [currentDate]);
+
+  // Fetch tags
+  const tags = useLiveQuery(() => db.tags.toArray(), []);
+
+  // Calculate stats
+  const stats = React.useMemo(() => {
+    if (!records || !tags) return null;
+    return calculateDayStats(records, tags, currentDate);
+  }, [records, tags, currentDate]);
+
+  const totalTime = stats ? formatMinutesToHM(stats.totalMinutes) : { hours: 0, minutes: 0 };
+  
+  // Get tag breakdown for display
+  const tagBreakdown = React.useMemo(() => {
+    if (!stats || !tags) return [];
+    
+    return Object.entries(stats.tagMinutes)
+      .map(([tagId, minutes]) => {
+        const tag = tags.find(t => t.id === tagId);
+        if (!tag) return null;
+        const time = formatMinutesToHM(minutes);
+        return { name: tag.name, color: tag.color, ...time };
+      })
+      .filter(Boolean)
+      .sort((a, b) => {
+        if (!a || !b) return 0;
+        const aTotal = a.hours * 60 + a.minutes;
+        const bTotal = b.hours * 60 + b.minutes;
+        return bTotal - aTotal; // Sort by duration descending
+      }) as Array<{ name: string; color: string; hours: number; minutes: number }>;
+  }, [stats, tags]);
 
   const handleToday = () => {
     setCurrentDate(new Date());
@@ -21,15 +67,6 @@ function DayControl() {
     next.setDate(next.getDate() + 1);
     setCurrentDate(next);
   };
-
-  // Mock data - will be replaced with real calculations
-  const totalHours = 12;
-  const totalMinutes = 15;
-  const tagBreakdown = [
-    { name: 'Work', color: '#4285F4', hours: 6, minutes: 30 },
-    { name: 'Study', color: '#34A853', hours: 3, minutes: 15 },
-    { name: 'Break', color: '#FBBC04', hours: 2, minutes: 30 },
-  ];
 
   return (
     <div className="flex items-center gap-4 h-full">
@@ -66,21 +103,23 @@ function DayControl() {
       <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">
         <div>
           <div className="text-sm text-gray-600 mb-1">Total Hours</div>
-          <div className="text-3xl font-semibold">{totalHours}h {totalMinutes}m</div>
+          <div className="text-3xl font-semibold">{totalTime.hours}h {totalTime.minutes}m</div>
         </div>
         
         {/* Tag breakdown inline */}
-        <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
-          {tagBreakdown.map((tag) => (
-            <div key={tag.name} className="flex items-center gap-2">
-              <div 
-                className="w-3 h-3 rounded-full flex-shrink-0"
-                style={{ backgroundColor: tag.color }}
-              />
-              <span className="font-mono text-base">{tag.hours}h {tag.minutes}m</span>
-            </div>
-          ))}
-        </div>
+        {tagBreakdown.length > 0 && (
+          <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
+            {tagBreakdown.map((tag) => (
+              <div key={tag.name} className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: tag.color }}
+                />
+                <span className="font-mono text-base">{tag.hours}h {tag.minutes}m</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

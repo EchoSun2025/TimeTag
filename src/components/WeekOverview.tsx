@@ -1,41 +1,100 @@
 import React, { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useAppStore } from '@/stores/appStore';
-import { formatWeekRange, getWeekDays, formatDuration } from '@/lib/utils';
-import { format } from 'date-fns';
+import { db } from '@/lib/db';
+import { formatWeekRange, getWeekDays } from '@/lib/utils';
+import { calculateDayStats, getDayTimeRange, formatMinutesToHM } from '@/lib/stats';
+import { format, startOfWeek, endOfWeek } from 'date-fns';
 
 function WeekOverview() {
-  const { currentDate, settings, showWeekExpanded, setShowWeekExpanded } = useAppStore();
+  const { currentDate, showWeekExpanded, setShowWeekExpanded } = useAppStore();
   const [weekDaysCount, setWeekDaysCount] = useState<5 | 7>(5);
 
   const weekDays = getWeekDays(currentDate, weekDaysCount);
+
+  // Fetch records for the week
+  const weekRecords = useLiveQuery(async () => {
+    const start = startOfWeek(currentDate, { weekStartsOn: 1 });
+    start.setHours(0, 0, 0, 0);
+    const end = endOfWeek(currentDate, { weekStartsOn: 1 });
+    end.setHours(23, 59, 59, 999);
+
+    return await db.records
+      .where('startTime')
+      .between(start, end, true, true)
+      .toArray();
+  }, [currentDate]);
+
+  // Fetch tags
+  const tags = useLiveQuery(() => db.tags.toArray(), []);
+
+  // Calculate week stats
+  const weekStats = React.useMemo(() => {
+    if (!weekRecords || !tags) return null;
+
+    const dayStats = weekDays.map(day => {
+      const dayRecords = weekRecords.filter(r => {
+        const recordDate = new Date(r.startTime);
+        return recordDate.toDateString() === day.toDateString();
+      });
+      return calculateDayStats(dayRecords, tags, day);
+    });
+
+    // Calculate week total
+    const weekTotalMinutes = dayStats.reduce((sum, day) => sum + day.totalMinutes, 0);
+
+    // Calculate tag totals for week
+    const weekTagMinutes: Record<string, number> = {};
+    dayStats.forEach(day => {
+      Object.entries(day.tagMinutes).forEach(([tagId, minutes]) => {
+        weekTagMinutes[tagId] = (weekTagMinutes[tagId] || 0) + minutes;
+      });
+    });
+
+    return {
+      totalMinutes: weekTotalMinutes,
+      tagMinutes: weekTagMinutes,
+      days: dayStats,
+    };
+  }, [weekRecords, tags, weekDays]);
 
   const toggleWeekDays = () => {
     setWeekDaysCount(weekDaysCount === 5 ? 7 : 5);
   };
 
   const handlePrevWeek = () => {
-    // Implementation
+    const prev = new Date(currentDate);
+    prev.setDate(prev.getDate() - 7);
+    useAppStore.getState().setCurrentDate(prev);
   };
 
   const handleNextWeek = () => {
-    // Implementation
+    const next = new Date(currentDate);
+    next.setDate(next.getDate() + 7);
+    useAppStore.getState().setCurrentDate(next);
   };
 
-  // Mock data - will be replaced with real calculations
-  const weekTotalHours = 45;
-  const weekTotalMinutes = 30;
-  const dayData = weekDays.map((day) => ({
-    date: day,
-    startTime: '9:00am',
-    endTime: '6:30pm',
-    breaks: [{ start: '11:30am', end: '12:00pm' }],
-    tags: [
-      { name: 'Work', color: '#4285F4', hours: 6, minutes: 30 },
-      { name: 'Study', color: '#34A853', hours: 2, minutes: 15 },
-    ],
-    totalHours: 8,
-    totalMinutes: 45,
-  }));
+  if (!weekStats || !tags) {
+    return <div className="flex items-center justify-center h-full">Loading...</div>;
+  }
+
+  const weekTotalTime = formatMinutesToHM(weekStats.totalMinutes);
+  
+  // Get week tag breakdown
+  const weekTagBreakdown = Object.entries(weekStats.tagMinutes)
+    .map(([tagId, minutes]) => {
+      const tag = tags.find(t => t.id === tagId);
+      if (!tag) return null;
+      const time = formatMinutesToHM(minutes);
+      return { name: tag.name, color: tag.color, ...time };
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      if (!a || !b) return 0;
+      const aTotal = a.hours * 60 + a.minutes;
+      const bTotal = b.hours * 60 + b.minutes;
+      return bTotal - aTotal;
+    }) as Array<{ name: string; color: string; hours: number; minutes: number }>;
 
   return (
     <div className="flex flex-col h-full">
@@ -82,73 +141,98 @@ function WeekOverview() {
         <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">
           <div>
             <div className="text-sm text-gray-600 mb-1">Week Total</div>
-            <div className="text-3xl font-semibold">{weekTotalHours}h {weekTotalMinutes}m</div>
+            <div className="text-3xl font-semibold">{weekTotalTime.hours}h {weekTotalTime.minutes}m</div>
           </div>
           
-          {/* Tag breakdown inline - mock data */}
-          <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full flex-shrink-0 bg-blue-500" />
-              <span className="font-mono text-base">28h 15m</span>
+          {/* Tag breakdown inline */}
+          {weekTagBreakdown.length > 0 && (
+            <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
+              {weekTagBreakdown.slice(0, 5).map((tag) => (
+                <div key={tag.name} className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: tag.color }}
+                  />
+                  <span className="font-mono text-base">{tag.hours}h {tag.minutes}m</span>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full flex-shrink-0 bg-green-500" />
-              <span className="font-mono text-base">12h 30m</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full flex-shrink-0 bg-yellow-500" />
-              <span className="font-mono text-base">4h 45m</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Day columns */}
       <div className="flex-1 overflow-auto">
         <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${weekDaysCount}, 1fr)` }}>
-          {dayData.map((day, index) => (
-            <div key={index} className="border border-gray-200 rounded p-3 text-sm">
-              {/* Day header */}
-              <div className="font-semibold mb-2 text-center">
-                {format(day.date, 'EEE')} {format(day.date, 'MM/dd')}
-              </div>
+          {weekStats.days.map((dayStats, index) => {
+            const day = weekDays[index];
+            const timeRange = getDayTimeRange(dayStats.records);
+            const dayTotal = formatMinutesToHM(dayStats.totalMinutes);
 
-              {/* Start time */}
-              <div className="text-base mb-1">
-                {day.startTime}
-              </div>
+            // Get tag breakdown for this day
+            const dayTagBreakdown = Object.entries(dayStats.tagMinutes)
+              .map(([tagId, minutes]) => {
+                const tag = tags.find(t => t.id === tagId);
+                if (!tag) return null;
+                const time = formatMinutesToHM(minutes);
+                return { color: tag.color, ...time };
+              })
+              .filter(Boolean) as Array<{ color: string; hours: number; minutes: number }>;
 
-              {/* Breaks */}
-              {day.breaks.map((brk, i) => (
-                <div key={i} className="text-base text-gray-600 mb-1">
-                  break {brk.start}-{brk.end}
+            return (
+              <div key={index} className="border border-gray-200 rounded p-3 text-sm">
+                {/* Day header */}
+                <div className="font-semibold mb-2 text-center">
+                  {format(day, 'EEE')} {format(day, 'MM/dd')}
                 </div>
-              ))}
 
-              {/* End time */}
-              <div className="text-base mb-3">
-                {day.endTime}
-              </div>
+                {dayStats.records.length === 0 ? (
+                  <div className="text-xs text-gray-400 text-center py-4">No records</div>
+                ) : (
+                  <>
+                    {/* Start time */}
+                    {timeRange.start && (
+                      <div className="text-base mb-1">
+                        {format(timeRange.start, 'h:mma').toLowerCase()}
+                      </div>
+                    )}
 
-              {/* Tag breakdown with colored dots */}
-              <div className="space-y-1 mb-3">
-                {day.tags.map((tag) => (
-                  <div key={tag.name} className="flex items-center gap-2 text-sm">
-                    <div 
-                      className="w-3 h-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: tag.color }}
-                    />
-                    <span className="font-mono">{tag.hours}h {tag.minutes}m</span>
-                  </div>
-                ))}
-              </div>
+                    {/* Breaks */}
+                    {dayStats.breaks.map((brk, i) => (
+                      <div key={i} className="text-base text-gray-600 mb-1">
+                        break {format(brk.startTime, 'h:mma').toLowerCase()}-{format(brk.endTime, 'h:mma').toLowerCase()}
+                      </div>
+                    ))}
 
-              {/* Total */}
-              <div className="text-xs border-t border-gray-200 pt-1">
-                Total: {day.totalHours}h {day.totalMinutes}m
+                    {/* End time */}
+                    {timeRange.end && (
+                      <div className="text-base mb-3">
+                        {format(timeRange.end, 'h:mma').toLowerCase()}
+                      </div>
+                    )}
+
+                    {/* Tag breakdown with colored dots */}
+                    <div className="space-y-1 mb-3">
+                      {dayTagBreakdown.map((tag, i) => (
+                        <div key={i} className="flex items-center gap-2 text-sm">
+                          <div 
+                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: tag.color }}
+                          />
+                          <span className="font-mono">{tag.hours}h {tag.minutes}m</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Total */}
+                    <div className="text-xs border-t border-gray-200 pt-1">
+                      Total: {dayTotal.hours}h {dayTotal.minutes}m
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Expanded view (mini timelines) */}

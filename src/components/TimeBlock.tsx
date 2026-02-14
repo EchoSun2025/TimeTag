@@ -124,8 +124,9 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit }: TimeBlockP
     >
       {/* Resize handle - Top */}
       <div
-        className="absolute top-0 left-0 right-0 h-2 cursor-ns-resize hover:bg-black/10 transition-colors"
+        className="absolute top-0 left-0 right-0 h-3 cursor-ns-resize hover:bg-black/10 transition-colors z-20"
         onMouseDown={(e) => handleMouseDown(e, 'resize-top')}
+        title="Drag to adjust start time"
       />
 
       {/* Main block */}
@@ -173,8 +174,9 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit }: TimeBlockP
 
       {/* Resize handle - Bottom */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize hover:bg-black/10 transition-colors"
+        className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize hover:bg-black/10 transition-colors z-20"
         onMouseDown={(e) => handleMouseDown(e, 'resize-bottom')}
+        title="Drag to adjust end time"
       />
     </div>
   );
