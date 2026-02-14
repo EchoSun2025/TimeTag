@@ -5,6 +5,7 @@ import Timeline from '@/components/Timeline';
 import DayControl from '@/components/DayControl';
 import TagsSection from '@/components/TagsSection';
 import WeekOverview from '@/components/WeekOverview';
+import TopBar from '@/components/TopBar';
 
 function App() {
   const { loadSettings, toggleRecording } = useAppStore();
@@ -32,27 +33,33 @@ function App() {
   }, [loadSettings, toggleRecording]);
 
   return (
-    <div className="flex h-screen bg-white text-black overflow-hidden">
-      {/* Left side - Timeline (1/3) */}
-      <div className="w-1/3 border-r border-gray-200">
-        <Timeline />
-      </div>
+    <div className="flex flex-col h-screen bg-white text-black overflow-hidden">
+      {/* Top bar with title and actions */}
+      <TopBar />
 
-      {/* Right side (2/3) */}
-      <div className="flex-1 flex flex-col">
-        {/* Top section - Day Control (auto height based on content) */}
-        <div className="border-b border-gray-200 py-6 px-8">
-          <DayControl />
+      {/* Main content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left side - Timeline (1/3) */}
+        <div className="w-1/3 border-r border-gray-200">
+          <Timeline />
         </div>
 
-        {/* Middle section - Tags (reduced height, just fit content) */}
-        <div className="border-b border-gray-200 px-8 py-4">
-          <TagsSection />
-        </div>
+        {/* Right side (2/3) */}
+        <div className="flex-1 flex flex-col">
+          {/* Top section - Day Control (auto height based on content) */}
+          <div className="border-b border-gray-200 py-6 px-8">
+            <DayControl />
+          </div>
 
-        {/* Bottom section - Week Overview (remaining space) */}
-        <div className="flex-1 px-8 py-6 overflow-auto">
-          <WeekOverview />
+          {/* Middle section - Tags (reduced height, just fit content) */}
+          <div className="border-b border-gray-200 px-8 py-4">
+            <TagsSection />
+          </div>
+
+          {/* Bottom section - Week Overview (remaining space) */}
+          <div className="flex-1 px-8 py-6 overflow-auto">
+            <WeekOverview />
+          </div>
         </div>
       </div>
     </div>
