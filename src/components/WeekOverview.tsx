@@ -41,7 +41,8 @@ function WeekOverview() {
     <div className="flex flex-col h-full">
       {/* Week navigation */}
       <div className="flex items-center gap-8 mb-6">
-        <div className="flex items-center gap-4">
+        {/* Week date navigation with background card */}
+        <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
           <button
             onClick={handlePrevWeek}
             className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
@@ -49,7 +50,7 @@ function WeekOverview() {
             &lt;
           </button>
           
-          <div className="text-xl font-bold font-sans">
+          <div className="text-xl font-sans">
             {formatWeekRange(currentDate)}
           </div>
           
@@ -60,12 +61,21 @@ function WeekOverview() {
             &gt;
           </button>
 
-          <button
-            onClick={toggleWeekDays}
-            className="px-4 py-2 text-base border border-gray-300 rounded hover:bg-gray-100"
-          >
-            {weekDaysCount} Days
-          </button>
+          {/* Combined 5/7 Days and Expand button */}
+          <div className="flex border border-gray-300 rounded-full overflow-hidden divide-x divide-gray-300">
+            <button
+              onClick={toggleWeekDays}
+              className="px-5 py-2 text-base hover:bg-gray-100"
+            >
+              {weekDaysCount} Days
+            </button>
+            <button
+              onClick={() => setShowWeekExpanded(!showWeekExpanded)}
+              className="px-5 py-2 text-base hover:bg-gray-100"
+            >
+              {showWeekExpanded ? 'Mini Timeline' : 'Expand'}
+            </button>
+          </div>
         </div>
 
         {/* Week total card with tag breakdown */}
@@ -104,19 +114,19 @@ function WeekOverview() {
               </div>
 
               {/* Start time */}
-              <div className="text-base font-bold mb-1">
+              <div className="text-base mb-1">
                 {day.startTime}
               </div>
 
               {/* Breaks */}
               {day.breaks.map((brk, i) => (
-                <div key={i} className="text-base font-bold text-gray-600 mb-1">
+                <div key={i} className="text-base text-gray-600 mb-1">
                   break {brk.start}-{brk.end}
                 </div>
               ))}
 
               {/* End time */}
-              <div className="text-base font-bold mb-3">
+              <div className="text-base mb-3">
                 {day.endTime}
               </div>
 

@@ -33,8 +33,8 @@ function DayControl() {
 
   return (
     <div className="flex items-center gap-8 h-full">
-      {/* Date navigation */}
-      <div className="flex items-center gap-4">
+      {/* Date navigation with background card */}
+      <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
         <button
           onClick={handlePrevDay}
           className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
@@ -42,7 +42,7 @@ function DayControl() {
           &lt;
         </button>
         
-        <div className="text-xl font-bold font-sans">
+        <div className="text-xl font-sans">
           {formatDate(currentDate)}
         </div>
         
@@ -55,7 +55,7 @@ function DayControl() {
         
         <button
           onClick={handleToday}
-          className="px-4 py-2 text-base border border-gray-300 rounded hover:bg-gray-100"
+          className="px-5 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-100"
         >
           Today
         </button>
