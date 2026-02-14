@@ -40,46 +40,56 @@ function WeekOverview() {
   return (
     <div className="flex flex-col h-full">
       {/* Week navigation */}
-      <div className="flex items-center justify-center gap-4 mb-4">
-        <button
-          onClick={handlePrevWeek}
-          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
-        >
-          &lt;
-        </button>
-        
-        <div className="text-xl font-mono">
-          {formatWeekRange(currentDate)}
+      <div className="flex items-center gap-8 mb-6">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handlePrevWeek}
+            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
+          >
+            &lt;
+          </button>
+          
+          <div className="text-xl font-bold font-sans">
+            {formatWeekRange(currentDate)}
+          </div>
+          
+          <button
+            onClick={handleNextWeek}
+            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
+          >
+            &gt;
+          </button>
+
+          <button
+            onClick={toggleWeekDays}
+            className="px-4 py-2 text-base border border-gray-300 rounded hover:bg-gray-100"
+          >
+            {weekDaysCount} Days
+          </button>
         </div>
-        
-        <button
-          onClick={handleNextWeek}
-          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
-        >
-          &gt;
-        </button>
 
-        <button
-          onClick={toggleWeekDays}
-          className="px-4 py-2 text-base border border-gray-300 rounded hover:bg-gray-100"
-        >
-          {weekDaysCount} Days
-        </button>
-      </div>
-
-      {/* Week total card */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 inline-block">
-        <div className="flex items-center gap-3">
+        {/* Week total card with tag breakdown */}
+        <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">
           <div>
             <div className="text-sm text-gray-600 mb-1">Week Total</div>
             <div className="text-3xl font-semibold">{weekTotalHours}h {weekTotalMinutes}m</div>
           </div>
-          <button
-            onClick={() => setShowWeekExpanded(!showWeekExpanded)}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 text-lg"
-          >
-            {showWeekExpanded ? '-' : '+'}
-          </button>
+          
+          {/* Tag breakdown inline - mock data */}
+          <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full flex-shrink-0 bg-blue-500" />
+              <span className="font-mono text-base">28h 15m</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full flex-shrink-0 bg-green-500" />
+              <span className="font-mono text-base">12h 30m</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full flex-shrink-0 bg-yellow-500" />
+              <span className="font-mono text-base">4h 45m</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -94,24 +104,24 @@ function WeekOverview() {
               </div>
 
               {/* Start time */}
-              <div className="text-gray-600 text-xs mb-1">
+              <div className="text-base font-bold mb-1">
                 {day.startTime}
               </div>
 
               {/* Breaks */}
               {day.breaks.map((brk, i) => (
-                <div key={i} className="text-xs text-gray-500 mb-1">
+                <div key={i} className="text-base font-bold text-gray-600 mb-1">
                   break {brk.start}-{brk.end}
                 </div>
               ))}
 
               {/* End time */}
-              <div className="text-gray-600 text-xs mb-2">
+              <div className="text-base font-bold mb-3">
                 {day.endTime}
               </div>
 
               {/* Tag breakdown with colored dots */}
-              <div className="space-y-1 mb-2">
+              <div className="space-y-1 mb-3">
                 {day.tags.map((tag) => (
                   <div key={tag.name} className="flex items-center gap-2 text-sm">
                     <div 
@@ -124,7 +134,7 @@ function WeekOverview() {
               </div>
 
               {/* Total */}
-              <div className="text-sm font-semibold border-t border-gray-200 pt-1">
+              <div className="text-xs border-t border-gray-200 pt-1">
                 Total: {day.totalHours}h {day.totalMinutes}m
               </div>
             </div>

@@ -40,18 +40,18 @@ function App() {
 
       {/* Right side (2/3) */}
       <div className="flex-1 flex flex-col">
-        {/* Top section - Day Control (1/5 of right side) */}
-        <div className="h-[20%] border-b border-gray-200 p-6">
+        {/* Top section - Day Control (auto height based on content) */}
+        <div className="border-b border-gray-200 py-6 px-8">
           <DayControl />
         </div>
 
         {/* Middle section - Tags (reduced height, just fit content) */}
-        <div className="border-b border-gray-200 px-6 py-4">
+        <div className="border-b border-gray-200 px-8 py-4">
           <TagsSection />
         </div>
 
         {/* Bottom section - Week Overview (remaining space) */}
-        <div className="flex-1 p-6 overflow-auto">
+        <div className="flex-1 px-8 py-6 overflow-auto">
           <WeekOverview />
         </div>
       </div>

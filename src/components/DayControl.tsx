@@ -25,16 +25,16 @@ function DayControl() {
   // Mock data - will be replaced with real calculations
   const totalHours = 12;
   const totalMinutes = 15;
-  const tagBreakdown = {
-    Work: { hours: 6, minutes: 30 },
-    Study: { hours: 3, minutes: 15 },
-    Break: { hours: 2, minutes: 30 },
-  };
+  const tagBreakdown = [
+    { name: 'Work', color: '#4285F4', hours: 6, minutes: 30 },
+    { name: 'Study', color: '#34A853', hours: 3, minutes: 15 },
+    { name: 'Break', color: '#FBBC04', hours: 2, minutes: 30 },
+  ];
 
   return (
-    <div className="flex flex-col items-center justify-center h-full">
+    <div className="flex items-center gap-8 h-full">
       {/* Date navigation */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4">
         <button
           onClick={handlePrevDay}
           className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
@@ -42,7 +42,7 @@ function DayControl() {
           &lt;
         </button>
         
-        <div className="text-2xl font-mono">
+        <div className="text-xl font-bold font-sans">
           {formatDate(currentDate)}
         </div>
         
@@ -61,31 +61,26 @@ function DayControl() {
         </button>
       </div>
 
-      {/* Total hours card */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 min-w-[200px]">
-        <div className="text-sm text-gray-600 text-center mb-2">Total Hours</div>
-        <div className="flex items-center justify-center gap-3">
-          <span className="text-4xl font-semibold">{totalHours}h {totalMinutes}m</span>
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 text-lg"
-          >
-            {showDetails ? '-' : '+'}
-          </button>
+      {/* Total hours card with tag breakdown */}
+      <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">
+        <div>
+          <div className="text-sm text-gray-600 mb-1">Total Hours</div>
+          <div className="text-3xl font-semibold">{totalHours}h {totalMinutes}m</div>
         </div>
-      </div>
-
-      {/* Tag breakdown (expandable to the right) */}
-      {showDetails && (
-        <div className="absolute top-20 right-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 shadow-lg text-base min-w-[180px]">
-          {Object.entries(tagBreakdown).map(([tag, time]) => (
-            <div key={tag} className="flex justify-between gap-6 mb-2">
-              <span className="text-gray-600">{tag}:</span>
-              <span className="font-mono">{time.hours}h {time.minutes}m</span>
+        
+        {/* Tag breakdown inline */}
+        <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
+          {tagBreakdown.map((tag) => (
+            <div key={tag.name} className="flex items-center gap-2">
+              <div 
+                className="w-3 h-3 rounded-full flex-shrink-0"
+                style={{ backgroundColor: tag.color }}
+              />
+              <span className="font-mono text-base">{tag.hours}h {tag.minutes}m</span>
             </div>
           ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }

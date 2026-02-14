@@ -16,21 +16,21 @@ export function formatTime(date: Date): string {
 }
 
 /**
- * Format date for display (e.g., "20260214 Sat.")
+ * Format date for display (e.g., "2026/02/14")
  */
 export function formatDate(date: Date): string {
-  return format(date, 'yyyyMMdd EEE.');
+  return format(date, 'yyyy/MM/dd EEE.');
 }
 
 /**
- * Format week range (e.g., "0209-0215 Feb.Week2")
+ * Format week range (e.g., "02/09-02/15 Feb.Week2")
  */
 export function formatWeekRange(date: Date): string {
   const start = startOfWeek(date, { weekStartsOn: 1 }); // Monday
   const end = endOfWeek(date, { weekStartsOn: 1 });
   const weekNumber = Math.ceil(start.getDate() / 7);
   
-  return `${format(start, 'MMdd')}-${format(end, 'MMdd')} ${format(date, 'MMM')}.Week${weekNumber}`;
+  return `${format(start, 'MM/dd')}-${format(end, 'MM/dd')} ${format(date, 'MMM')}.Week${weekNumber}`;
 }
 
 /**
