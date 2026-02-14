@@ -9,11 +9,13 @@ interface TimeBlockProps {
   heightPerHour: number;
   dayStart: number;
   onEdit: () => void;
+  column?: number;
+  totalColumns?: number;
 }
 
 type DragMode = 'none' | 'move' | 'resize-top' | 'resize-bottom';
 
-function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit }: TimeBlockProps) {
+function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, totalColumns = 1 }: TimeBlockProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragMode, setDragMode] = useState<DragMode>('none');
   const dragStartY = useRef(0);
@@ -39,6 +41,10 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit }: TimeBlockP
   
   const backgroundColor = firstTag ? firstTag.color + '40' : 'rgba(125, 211, 252, 0.3)';
   const borderColor = firstTag ? firstTag.color : '#7dd3fc';
+
+  // Calculate width and left position for overlapping blocks
+  const columnWidth = 100 / totalColumns;
+  const leftPercent = column * columnWidth;
 
   const handleMouseDown = (e: React.MouseEvent, mode: DragMode) => {
     e.stopPropagation();
@@ -115,10 +121,12 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit }: TimeBlockP
   
   return (
     <div
-      className="absolute left-0 right-0 px-1 group"
+      className="absolute px-1 group"
       style={{
         top: `${top}px`,
         height: `${height}px`,
+        left: `${leftPercent}%`,
+        width: `${columnWidth}%`,
         zIndex: isDragging ? 50 : 10,
       }}
     >

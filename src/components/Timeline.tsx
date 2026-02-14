@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useAppStore } from '@/stores/appStore';
 import { db } from '@/lib/db';
 import RecordModal from './RecordModal';
 import TimeBlock from './TimeBlock';
 import { TimeRecord } from '@/types';
+import { calculateOverlappingLayout } from '@/lib/layout';
 
 function Timeline() {
   const { timelineZoom, setTimelineZoom, currentDate } = useAppStore();
@@ -29,6 +30,12 @@ function Timeline() {
 
   // Fetch tags
   const tags = useLiveQuery(() => db.tags.toArray(), []);
+
+  // Calculate overlapping layout
+  const recordsWithLayout = useMemo(() => {
+    if (!records) return [];
+    return calculateOverlappingLayout(records);
+  }, [records]);
 
   const handleZoomIn = () => setTimelineZoom(timelineZoom + 1);
   const handleZoomOut = () => setTimelineZoom(timelineZoom - 1);
@@ -175,8 +182,8 @@ function Timeline() {
               onDoubleClick={handleDoubleClick}
             />
             
-            {/* Render time blocks */}
-            {records && tags && records.map(record => (
+            {/* Render time blocks with overlap support */}
+            {recordsWithLayout && tags && recordsWithLayout.map(record => (
               <TimeBlock
                 key={record.id}
                 record={record}
@@ -184,6 +191,8 @@ function Timeline() {
                 heightPerHour={heightPerHour}
                 dayStart={dayStartTimestamp}
                 onEdit={() => handleBlockEdit(record)}
+                column={record.column}
+                totalColumns={record.totalColumns}
               />
             ))}
           </div>
