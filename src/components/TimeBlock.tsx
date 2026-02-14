@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { TimeRecord, Tag } from '@/types';
-import { formatTime } from '@/lib/utils';
+import { formatTime, roundTime } from '@/lib/utils';
 import { db } from '@/lib/db';
+import { useAppStore } from '@/stores/appStore';
 
 interface TimeBlockProps {
   record: TimeRecord;
@@ -18,10 +19,13 @@ type DragMode = 'none' | 'move' | 'resize-top' | 'resize-bottom';
 function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, totalColumns = 1 }: TimeBlockProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragMode, setDragMode] = useState<DragMode>('none');
+  const [showDelete, setShowDelete] = useState(false);
   const dragStartY = useRef(0);
   const initialStartTime = useRef(0);
   const initialEndTime = useRef(0);
   const hasDragged = useRef(false);
+  
+  const { settings } = useAppStore();
 
   const startTime = new Date(record.startTime).getTime();
   const endTime = new Date(record.endTime).getTime();
@@ -93,10 +97,19 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
       newStartTime = Math.max(dayStart, Math.min(newStartTime, dayEnd));
       newEndTime = Math.max(dayStart, Math.min(newEndTime, dayEnd));
 
+      // Apply 15-minute rounding if enabled
+      let finalStartTime = new Date(newStartTime);
+      let finalEndTime = new Date(newEndTime);
+      
+      if (settings?.timeRounding) {
+        finalStartTime = roundTime(finalStartTime, 15);
+        finalEndTime = roundTime(finalEndTime, 15);
+      }
+
       // Update database
       db.records.update(record.id, {
-        startTime: new Date(newStartTime),
-        endTime: new Date(newEndTime),
+        startTime: finalStartTime,
+        endTime: finalEndTime,
         updatedAt: new Date(),
       });
     };
@@ -116,6 +129,13 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
     e.stopPropagation();
     if (!hasDragged.current) {
       onEdit();
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Delete this record?')) {
+      await db.records.delete(record.id);
     }
   };
   
@@ -139,7 +159,7 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
 
       {/* Main block */}
       <div
-        className={`h-full rounded border-l-4 px-2 py-1 overflow-hidden cursor-move hover:brightness-110 transition-all ${
+        className={`h-full rounded border-l-4 px-2 py-1 overflow-hidden cursor-move hover:brightness-110 transition-all relative ${
           isDragging ? 'opacity-70 shadow-lg' : ''
         }`}
         style={{
@@ -148,7 +168,20 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
         }}
         onMouseDown={(e) => handleMouseDown(e, 'move')}
         onDoubleClick={handleDoubleClick}
+        onMouseEnter={() => setShowDelete(true)}
+        onMouseLeave={() => setShowDelete(false)}
       >
+        {/* Delete button - top right corner */}
+        {showDelete && !isDragging && (
+          <button
+            onClick={handleDelete}
+            className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-bold z-30 shadow-md"
+            title="Delete record"
+          >
+            ×
+          </button>
+        )}
+
         {/* Time range */}
         <div className="text-xs font-medium opacity-80 pointer-events-none">
           {formatTime(new Date(record.startTime))} - {formatTime(new Date(record.endTime))}
