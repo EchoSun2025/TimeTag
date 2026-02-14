@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppStore } from '@/stores/appStore';
 import { initializeDatabase } from '@/lib/db';
 import Timeline from '@/components/Timeline';
@@ -7,9 +7,12 @@ import TagsSection from '@/components/TagsSection';
 import WeekOverview from '@/components/WeekOverview';
 import TopBar from '@/components/TopBar';
 import MiniWindow from '@/components/MiniWindow';
+import RecordModal from '@/components/RecordModal';
 
 function App() {
-  const { loadSettings, toggleQuickRecording } = useAppStore();
+  const { loadSettings, currentDate } = useAppStore();
+  const [isQuickRecordOpen, setIsQuickRecordOpen] = useState(false);
+  const [quickRecordStart, setQuickRecordStart] = useState<Date | undefined>();
   
   // Check if we're in mini mode from URL hash
   const isMiniMode = window.location.hash === '#/mini';
@@ -25,7 +28,15 @@ function App() {
     // Register Alt+X shortcut listener
     if (window.electronAPI) {
       window.electronAPI.onToggleRecording(() => {
-        toggleQuickRecording();
+        if (!isQuickRecordOpen) {
+          // Open modal with current time as start
+          const now = new Date();
+          setQuickRecordStart(now);
+          setIsQuickRecordOpen(true);
+        } else {
+          // Close modal
+          setIsQuickRecordOpen(false);
+        }
       });
     }
 
@@ -34,12 +45,15 @@ function App() {
         window.electronAPI.removeAllListeners('shortcut:toggle-recording');
       }
     };
-  }, [loadSettings, toggleQuickRecording]);
+  }, [loadSettings, isQuickRecordOpen]);
 
   // Render mini window if in mini mode
   if (isMiniMode) {
     return <MiniWindow />;
   }
+
+  // Calculate end time for quick record (1 hour from start)
+  const quickRecordEnd = quickRecordStart ? new Date(quickRecordStart.getTime() + 60 * 60 * 1000) : undefined;
 
   return (
     <div className="flex flex-col h-screen bg-white text-black overflow-hidden">
@@ -71,6 +85,17 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Quick Record Modal (Alt+X) */}
+      <RecordModal
+        isOpen={isQuickRecordOpen}
+        onClose={() => {
+          setIsQuickRecordOpen(false);
+          setQuickRecordStart(undefined);
+        }}
+        initialStartTime={quickRecordStart}
+        initialEndTime={quickRecordEnd}
+      />
     </div>
   );
 }

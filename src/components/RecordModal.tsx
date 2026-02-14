@@ -18,6 +18,12 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [focusedTagIndex, setFocusedTagIndex] = useState(-1);
+  
+  const descriptionRef = React.useRef<HTMLInputElement>(null);
+  const startTimeRef = React.useRef<HTMLInputElement>(null);
+  const endTimeRef = React.useRef<HTMLInputElement>(null);
+  const tagsContainerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (editRecord) {
@@ -91,7 +97,63 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
     setStartTime('');
     setEndTime('');
     setSelectedTags([]);
+    setFocusedTagIndex(-1);
     onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Arrow up/down: navigate between fields
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (document.activeElement === descriptionRef.current) {
+        startTimeRef.current?.focus();
+      } else if (document.activeElement === startTimeRef.current) {
+        endTimeRef.current?.focus();
+      } else if (document.activeElement === endTimeRef.current) {
+        tagsContainerRef.current?.focus();
+        if (tags && tags.length > 0) {
+          setFocusedTagIndex(0);
+        }
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (document.activeElement === endTimeRef.current) {
+        startTimeRef.current?.focus();
+      } else if (document.activeElement === startTimeRef.current) {
+        descriptionRef.current?.focus();
+      } else if (document.activeElement === tagsContainerRef.current) {
+        endTimeRef.current?.focus();
+        setFocusedTagIndex(-1);
+      }
+    }
+    
+    // Arrow left/right: navigate tags
+    if (document.activeElement === tagsContainerRef.current && tags) {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setFocusedTagIndex(prev => Math.min(prev + 1, tags.length - 1));
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setFocusedTagIndex(prev => Math.max(prev - 1, 0));
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (focusedTagIndex >= 0 && focusedTagIndex < tags.length) {
+          handleTagToggle(tags[focusedTagIndex].id);
+        }
+      }
+    }
+
+    // Enter to save (when not in tags container)
+    if (e.key === 'Enter' && document.activeElement !== tagsContainerRef.current) {
+      e.preventDefault();
+      handleSave();
+    }
+
+    // Escape to close
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      handleClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -105,7 +167,7 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4" onKeyDown={handleKeyDown}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold">
@@ -127,6 +189,7 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
               Description
             </label>
             <input
+              ref={descriptionRef}
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -143,6 +206,7 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
                 Start Time
               </label>
               <input
+                ref={startTimeRef}
                 type="datetime-local"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
@@ -154,6 +218,7 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
                 End Time
               </label>
               <input
+                ref={endTimeRef}
                 type="datetime-local"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
@@ -167,8 +232,12 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tags
             </label>
-            <div className="flex flex-wrap gap-2">
-              {tags?.map((tag) => (
+            <div 
+              ref={tagsContainerRef}
+              className="flex flex-wrap gap-2 outline-none"
+              tabIndex={0}
+            >
+              {tags?.map((tag, index) => (
                 <button
                   key={tag.id}
                   onClick={() => handleTagToggle(tag.id)}
@@ -176,14 +245,20 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
                     selectedTags.includes(tag.id)
                       ? 'text-white'
                       : 'bg-gray-200 text-gray-600'
+                  } ${
+                    focusedTagIndex === index ? 'ring-2 ring-blue-500' : ''
                   }`}
                   style={{
                     backgroundColor: selectedTags.includes(tag.id) ? tag.color : undefined,
                   }}
+                  tabIndex={-1}
                 >
                   {tag.name}
                 </button>
               ))}
+            </div>
+            <div className="text-xs text-gray-400 mt-2">
+              Use ← → arrows to navigate tags, Enter/Space to select
             </div>
           </div>
         </div>
