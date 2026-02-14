@@ -22,17 +22,19 @@ function WeekOverview() {
   };
 
   // Mock data - will be replaced with real calculations
-  const weekTotal = 45.5;
+  const weekTotalHours = 45;
+  const weekTotalMinutes = 30;
   const dayData = weekDays.map((day) => ({
     date: day,
     startTime: '9:00am',
     endTime: '6:30pm',
     breaks: [{ start: '11:30am', end: '12:00pm' }],
-    tags: {
-      Work: 6.5,
-      Study: 2.25,
-    },
-    total: 8.75,
+    tags: [
+      { name: 'Work', color: '#4285F4', hours: 6, minutes: 30 },
+      { name: 'Study', color: '#34A853', hours: 2, minutes: 15 },
+    ],
+    totalHours: 8,
+    totalMinutes: 45,
   }));
 
   return (
@@ -41,34 +43,44 @@ function WeekOverview() {
       <div className="flex items-center justify-center gap-4 mb-4">
         <button
           onClick={handlePrevWeek}
-          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
+          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
         >
           &lt;
         </button>
         
-        <div className="text-base font-mono">
+        <div className="text-xl font-mono">
           {formatWeekRange(currentDate)}
         </div>
         
         <button
           onClick={handleNextWeek}
-          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
+          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
         >
           &gt;
         </button>
 
         <button
           onClick={toggleWeekDays}
-          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          className="px-4 py-2 text-base border border-gray-300 rounded hover:bg-gray-100"
         >
           {weekDaysCount} Days
         </button>
       </div>
 
-      {/* Week total */}
-      <div className="text-center mb-4">
-        <span className="text-sm text-gray-600">Week Total: </span>
-        <span className="text-lg font-semibold">{formatDuration(weekTotal * 60)}</span>
+      {/* Week total card */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 inline-block">
+        <div className="flex items-center gap-3">
+          <div>
+            <div className="text-sm text-gray-600 mb-1">Week Total</div>
+            <div className="text-3xl font-semibold">{weekTotalHours}h {weekTotalMinutes}m</div>
+          </div>
+          <button
+            onClick={() => setShowWeekExpanded(!showWeekExpanded)}
+            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 text-lg"
+          >
+            {showWeekExpanded ? '-' : '+'}
+          </button>
+        </div>
       </div>
 
       {/* Day columns */}
@@ -98,36 +110,30 @@ function WeekOverview() {
                 {day.endTime}
               </div>
 
-              {/* Tag breakdown */}
+              {/* Tag breakdown with colored dots */}
               <div className="space-y-1 mb-2">
-                {Object.entries(day.tags).map(([tag, hours]) => (
-                  <div key={tag} className="text-xs">
-                    {tag}: {formatDuration(hours * 60)}
+                {day.tags.map((tag) => (
+                  <div key={tag.name} className="flex items-center gap-2 text-sm">
+                    <div 
+                      className="w-3 h-3 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: tag.color }}
+                    />
+                    <span className="font-mono">{tag.hours}h {tag.minutes}m</span>
                   </div>
                 ))}
               </div>
 
               {/* Total */}
-              <div className="text-xs font-semibold border-t border-gray-200 pt-1">
-                Total: {formatDuration(day.total * 60)}
+              <div className="text-sm font-semibold border-t border-gray-200 pt-1">
+                Total: {day.totalHours}h {day.totalMinutes}m
               </div>
             </div>
           ))}
         </div>
 
-        {/* Expand button */}
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => setShowWeekExpanded(!showWeekExpanded)}
-            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
-          >
-            {showWeekExpanded ? 'Collapse' : 'Expand'} Details
-          </button>
-        </div>
-
         {/* Expanded view (mini timelines) */}
         {showWeekExpanded && (
-          <div className="mt-4 text-center text-gray-500">
+          <div className="mt-4 text-center text-gray-500 text-base">
             Expanded timeline view coming soon...
           </div>
         )}

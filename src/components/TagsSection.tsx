@@ -15,10 +15,10 @@ function TagsSection() {
   if (!tags) return <div className="flex items-center justify-center h-full">Loading tags...</div>;
 
   return (
-    <div className="flex flex-col h-full">
-      <h3 className="text-sm font-semibold mb-3">TAGS</h3>
+    <div className="flex items-center gap-4 h-full">
+      <h3 className="text-sm font-semibold whitespace-nowrap">TAGS</h3>
       
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 flex-1">
         {tags.map((tag) => (
           <button
             key={tag.id}
@@ -37,7 +37,7 @@ function TagsSection() {
         ))}
       </div>
       
-      <div className="mt-3 text-xs text-gray-500">
+      <div className="text-xs text-gray-500 whitespace-nowrap ml-auto">
         Click tags to toggle inclusion in statistics
       </div>
     </div>

@@ -28,33 +28,30 @@ function Timeline() {
   const heightPerHour = baseHeightPerHour * timelineZoom;
 
   return (
-    <div className="h-full flex flex-col bg-white">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-        <h2 className="text-lg font-semibold">Timeline</h2>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleZoomOut}
-            disabled={timelineZoom <= 1}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Zoom out"
-          >
-            -
-          </button>
-          <button
-            onClick={handleZoomIn}
-            disabled={timelineZoom >= 5}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Zoom in"
-          >
-            +
-          </button>
-        </div>
+    <div className="h-full flex flex-col bg-yellow-50 relative">
+      {/* Floating zoom controls */}
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+        <button
+          onClick={handleZoomOut}
+          disabled={timelineZoom <= 1}
+          className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          title="Zoom out"
+        >
+          -
+        </button>
+        <button
+          onClick={handleZoomIn}
+          disabled={timelineZoom >= 5}
+          className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          title="Zoom in"
+        >
+          +
+        </button>
       </div>
 
       {/* Timeline content */}
       <div
-        className="flex-1 overflow-y-auto scrollbar-hide relative"
+        className="flex-1 overflow-y-auto scrollbar-hide relative pt-4"
         onWheel={handleWheel}
       >
         <div className="relative">
@@ -107,7 +104,7 @@ function Timeline() {
       </div>
 
       {/* Footer hint */}
-      <div className="px-4 py-2 border-t border-gray-200 text-xs text-gray-500 text-center">
+      <div className="px-4 py-2 border-t border-yellow-100 text-xs text-gray-500 text-center">
         Double-click to create record | Alt + Wheel to zoom
       </div>
     </div>

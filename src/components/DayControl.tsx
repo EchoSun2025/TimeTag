@@ -23,62 +23,65 @@ function DayControl() {
   };
 
   // Mock data - will be replaced with real calculations
-  const totalHours = 12.25;
+  const totalHours = 12;
+  const totalMinutes = 15;
   const tagBreakdown = {
-    Work: 6.5,
-    Study: 3.25,
-    Break: 2.5,
+    Work: { hours: 6, minutes: 30 },
+    Study: { hours: 3, minutes: 15 },
+    Break: { hours: 2, minutes: 30 },
   };
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
       {/* Date navigation */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-4 mb-6">
         <button
           onClick={handlePrevDay}
-          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
+          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
         >
           &lt;
         </button>
         
-        <div className="text-lg font-mono">
+        <div className="text-2xl font-mono">
           {formatDate(currentDate)}
         </div>
         
         <button
           onClick={handleNextDay}
-          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
+          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
         >
           &gt;
         </button>
         
         <button
           onClick={handleToday}
-          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
+          className="px-4 py-2 text-base border border-gray-300 rounded hover:bg-gray-100"
         >
           Today
         </button>
       </div>
 
-      {/* Total hours */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600">Total Hours:</span>
-        <span className="text-xl font-semibold">{totalHours}h</span>
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          className="w-6 h-6 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100"
-        >
-          {showDetails ? '-' : '+'}
-        </button>
+      {/* Total hours card */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 min-w-[200px]">
+        <div className="text-sm text-gray-600 text-center mb-2">Total Hours</div>
+        <div className="flex items-center justify-center gap-3">
+          <span className="text-4xl font-semibold">{totalHours}h {totalMinutes}m</span>
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 text-lg"
+          >
+            {showDetails ? '-' : '+'}
+          </button>
+        </div>
       </div>
 
-      {/* Tag breakdown (expandable) */}
+      {/* Tag breakdown (expandable to the right) */}
       {showDetails && (
-        <div className="mt-3 text-sm space-y-1">
-          {Object.entries(tagBreakdown).map(([tag, hours]) => (
-            <div key={tag} className="flex justify-between gap-4">
+        <div className="absolute top-20 right-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 shadow-lg text-base min-w-[180px]">
+          {Object.entries(tagBreakdown).map(([tag, time]) => (
+            <div key={tag} className="flex justify-between gap-6 mb-2">
               <span className="text-gray-600">{tag}:</span>
-              <span className="font-mono">{hours}h</span>
+              <span className="font-mono">{time.hours}h {time.minutes}m</span>
             </div>
           ))}
         </div>
