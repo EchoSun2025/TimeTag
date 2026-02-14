@@ -78,6 +78,14 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
     handleClose();
   };
 
+  const handleDelete = async () => {
+    if (!editRecord) return;
+    if (confirm('Delete this record?')) {
+      await db.records.delete(editRecord.id);
+      handleClose();
+    }
+  };
+
   const handleClose = () => {
     setDescription('');
     setStartTime('');
@@ -181,19 +189,32 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
-          <button
-            onClick={handleClose}
-            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-          >
-            {editRecord ? 'Update' : 'Create'}
-          </button>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+          {/* Delete button on left (only when editing) */}
+          {editRecord && (
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+            >
+              Delete
+            </button>
+          )}
+          
+          {/* Action buttons on right */}
+          <div className={`flex items-center gap-3 ${!editRecord ? 'ml-auto' : ''}`}>
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            >
+              {editRecord ? 'Update' : 'Create'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
