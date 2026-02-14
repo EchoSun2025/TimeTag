@@ -6,9 +6,13 @@ import DayControl from '@/components/DayControl';
 import TagsSection from '@/components/TagsSection';
 import WeekOverview from '@/components/WeekOverview';
 import TopBar from '@/components/TopBar';
+import MiniWindow from '@/components/MiniWindow';
 
 function App() {
-  const { loadSettings, toggleRecording } = useAppStore();
+  const { loadSettings, toggleQuickRecording } = useAppStore();
+  
+  // Check if we're in mini mode from URL hash
+  const isMiniMode = window.location.hash === '#/mini';
 
   useEffect(() => {
     // Initialize database and load settings
@@ -18,10 +22,10 @@ function App() {
     };
     init();
 
-    // Register keyboard shortcut listener
+    // Register Alt+X shortcut listener
     if (window.electronAPI) {
       window.electronAPI.onToggleRecording(() => {
-        toggleRecording();
+        toggleQuickRecording();
       });
     }
 
@@ -30,7 +34,12 @@ function App() {
         window.electronAPI.removeAllListeners('shortcut:toggle-recording');
       }
     };
-  }, [loadSettings, toggleRecording]);
+  }, [loadSettings, toggleQuickRecording]);
+
+  // Render mini window if in mini mode
+  if (isMiniMode) {
+    return <MiniWindow />;
+  }
 
   return (
     <div className="flex flex-col h-screen bg-white text-black overflow-hidden">

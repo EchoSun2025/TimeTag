@@ -7,11 +7,9 @@ interface AppState {
   currentDate: Date;
   currentWeekStart: Date;
   
-  // Recording state
-  isRecording: boolean;
-  currentRecordStart: Date | null;
-  currentRecordDescription: string;
-  currentRecordTags: string[];
+  // Quick recording state (Alt+X)
+  isQuickRecording: boolean;
+  quickRecordStart: Date | null;
   
   // Timeline zoom (1-5 scale)
   timelineZoom: number;
@@ -28,10 +26,10 @@ interface AppState {
   setTimelineZoom: (zoom: number) => void;
   setShowWeekExpanded: (expanded: boolean) => void;
   
-  // Recording actions
-  startRecording: (description: string, tags: string[]) => void;
-  stopRecording: () => Promise<void>;
-  toggleRecording: () => void;
+  // Quick recording actions (Alt+X)
+  startQuickRecording: () => void;
+  stopQuickRecording: () => Promise<void>;
+  toggleQuickRecording: () => void;
   
   // Settings actions
   loadSettings: () => Promise<void>;
@@ -42,10 +40,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Initial state
   currentDate: new Date(),
   currentWeekStart: new Date(),
-  isRecording: false,
-  currentRecordStart: null,
-  currentRecordDescription: '',
-  currentRecordTags: [],
+  isQuickRecording: false,
+  quickRecordStart: null,
   timelineZoom: 3, // Default zoom level
   settings: null,
   showWeekExpanded: false,
@@ -58,13 +54,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   setTimelineZoom: (zoom) => set({ timelineZoom: Math.max(1, Math.min(5, zoom)) }),
   setShowWeekExpanded: (expanded) => set({ showWeekExpanded: expanded }),
   
-  // Recording
-  startRecording: (description, tags) => {
+  // Quick recording (Alt+X)
+  startQuickRecording: () => {
     set({
-      isRecording: true,
-      currentRecordStart: new Date(),
-      currentRecordDescription: description,
-      currentRecordTags: tags,
+      isQuickRecording: true,
+      quickRecordStart: new Date(),
     });
     
     // Minimize to mini window
@@ -73,17 +67,17 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
   
-  stopRecording: async () => {
+  stopQuickRecording: async () => {
     const state = get();
-    if (!state.isRecording || !state.currentRecordStart) return;
+    if (!state.isQuickRecording || !state.quickRecordStart) return;
     
     const endTime = new Date();
     const record: TimeRecord = {
       id: crypto.randomUUID(),
-      description: state.currentRecordDescription,
-      startTime: state.currentRecordStart,
+      description: 'Quick Record',
+      startTime: state.quickRecordStart,
       endTime,
-      tags: state.currentRecordTags,
+      tags: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -93,25 +87,22 @@ export const useAppStore = create<AppState>((set, get) => ({
     
     // Reset recording state
     set({
-      isRecording: false,
-      currentRecordStart: null,
-      currentRecordDescription: '',
-      currentRecordTags: [],
+      isQuickRecording: false,
+      quickRecordStart: null,
     });
     
-    // Restore main window
+    // Restore main window and open edit modal
     if (window.electronAPI) {
       window.electronAPI.restoreFromMini();
     }
   },
   
-  toggleRecording: () => {
+  toggleQuickRecording: () => {
     const state = get();
-    if (state.isRecording) {
-      state.stopRecording();
+    if (state.isQuickRecording) {
+      state.stopQuickRecording();
     } else {
-      // Open recording modal (to be implemented)
-      console.log('Open recording modal');
+      state.startQuickRecording();
     }
   },
   
