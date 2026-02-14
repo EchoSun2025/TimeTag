@@ -41,12 +41,43 @@ function Timeline() {
   const handleZoomOut = () => setTimelineZoom(timelineZoom - 1);
 
   const handleWheel = (e: React.WheelEvent) => {
-    if (e.altKey) {
+    if (e.altKey && containerRef.current) {
       e.preventDefault();
+      
+      // Get mouse position relative to container
+      const rect = containerRef.current.getBoundingClientRect();
+      const scrollTop = containerRef.current.scrollTop;
+      const mouseY = e.clientY - rect.top + scrollTop - 16; // Subtract padding
+      
+      // Calculate the hour position at mouse cursor
+      const oldHeightPerHour = baseHeightPerHour * timelineZoom;
+      const mouseHourPosition = mouseY / oldHeightPerHour;
+      
+      // Change zoom
+      let newZoom = timelineZoom;
       if (e.deltaY < 0) {
-        handleZoomIn();
+        newZoom = Math.min(timelineZoom + 1, 5);
       } else {
-        handleZoomOut();
+        newZoom = Math.max(timelineZoom - 1, 1);
+      }
+      
+      if (newZoom !== timelineZoom) {
+        // Calculate new height per hour
+        const newHeightPerHour = baseHeightPerHour * newZoom;
+        
+        // Calculate new scroll position to keep mouse position fixed
+        const newMouseY = mouseHourPosition * newHeightPerHour;
+        const newScrollTop = newMouseY - (e.clientY - rect.top) + 16; // Add padding back
+        
+        // Update zoom
+        setTimelineZoom(newZoom);
+        
+        // Update scroll position after a short delay to ensure render
+        setTimeout(() => {
+          if (containerRef.current) {
+            containerRef.current.scrollTop = newScrollTop;
+          }
+        }, 0);
       }
     }
   };

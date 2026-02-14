@@ -133,6 +133,7 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     if (confirm('Delete this record?')) {
       await db.records.delete(record.id);
@@ -175,7 +176,8 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
         {showDelete && !isDragging && (
           <button
             onClick={handleDelete}
-            className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-bold z-30 shadow-md"
+            onMouseDown={(e) => e.stopPropagation()}
+            className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-bold z-30 shadow-md pointer-events-auto"
             title="Delete record"
           >
             ×
