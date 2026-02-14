@@ -32,7 +32,7 @@ function DayControl() {
   ];
 
   return (
-    <div className="flex items-center gap-8 h-full">
+    <div className="flex items-center gap-4 h-full">
       {/* Date navigation with background card */}
       <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
         <button
@@ -52,14 +52,15 @@ function DayControl() {
         >
           &gt;
         </button>
-        
-        <button
-          onClick={handleToday}
-          className="px-5 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-100"
-        >
-          Today
-        </button>
       </div>
+
+      {/* Today button - outside with deeper yellow background */}
+      <button
+        onClick={handleToday}
+        className="px-6 py-2.5 text-base bg-yellow-100 border border-yellow-300 rounded-full hover:bg-yellow-200 transition-colors"
+      >
+        Today
+      </button>
 
       {/* Total hours card with tag breakdown */}
       <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">

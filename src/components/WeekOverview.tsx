@@ -40,7 +40,7 @@ function WeekOverview() {
   return (
     <div className="flex flex-col h-full">
       {/* Week navigation */}
-      <div className="flex items-center gap-8 mb-6">
+      <div className="flex items-center gap-4 mb-6">
         {/* Week date navigation with background card */}
         <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
           <button
@@ -60,22 +60,22 @@ function WeekOverview() {
           >
             &gt;
           </button>
+        </div>
 
-          {/* Combined 5/7 Days and Expand button */}
-          <div className="flex border border-gray-300 rounded-full overflow-hidden divide-x divide-gray-300">
-            <button
-              onClick={toggleWeekDays}
-              className="px-5 py-2 text-base hover:bg-gray-100"
-            >
-              {weekDaysCount} Days
-            </button>
-            <button
-              onClick={() => setShowWeekExpanded(!showWeekExpanded)}
-              className="px-5 py-2 text-base hover:bg-gray-100"
-            >
-              {showWeekExpanded ? 'Mini Timeline' : 'Expand'}
-            </button>
-          </div>
+        {/* Combined 5/7 Days and Expand button - outside with deeper yellow background */}
+        <div className="flex bg-yellow-100 border border-yellow-300 rounded-full overflow-hidden divide-x divide-yellow-300">
+          <button
+            onClick={toggleWeekDays}
+            className="px-6 py-2.5 text-base hover:bg-yellow-200 transition-colors"
+          >
+            {weekDaysCount} Days
+          </button>
+          <button
+            onClick={() => setShowWeekExpanded(!showWeekExpanded)}
+            className="px-6 py-2.5 text-base hover:bg-yellow-200 transition-colors"
+          >
+            {showWeekExpanded ? 'Mini Timeline' : 'Expand'}
+          </button>
         </div>
 
         {/* Week total card with tag breakdown */}
