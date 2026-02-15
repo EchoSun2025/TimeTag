@@ -37,12 +37,15 @@ function createMainWindow() {
 
 function createMiniWindow() {
   miniWindow = new BrowserWindow({
-    width: 320,
-    height: 100,
+    width: 280,
+    height: 120,
+    x: 20,  // Position at left
+    y: 20,  // Position at top
     frame: false,
     transparent: true,
     alwaysOnTop: true,
     resizable: false,
+    movable: true,  // Allow dragging
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -57,6 +60,9 @@ function createMiniWindow() {
       hash: 'mini',
     });
   }
+
+  // Make window draggable
+  miniWindow.setIgnoreMouseEvents(false);
 
   miniWindow.on('closed', () => {
     miniWindow = null;
