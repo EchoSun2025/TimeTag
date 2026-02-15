@@ -121,25 +121,29 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // In tags container
     if (document.activeElement === tagsContainerRef.current && tags) {
+      const TAGS_PER_ROW = 9; // Typically 9 tags fit per row
+      
       // Arrow up/down/left/right: navigate tags (2D grid)
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        // Move down to next row (try +3 for typical 3-column layout)
-        const nextIndex = focusedTagIndex + 3;
+        // Move down to next row (±9 for 9-column layout)
+        const nextIndex = focusedTagIndex + TAGS_PER_ROW;
         if (nextIndex < tags.length) {
           setFocusedTagIndex(nextIndex);
         } else {
-          // If no tag below, move to description
-          descriptionRef.current?.focus();
+          // If would go past end, jump to last tag
+          setFocusedTagIndex(tags.length - 1);
         }
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         // Move up to previous row
-        const prevIndex = focusedTagIndex - 3;
+        const prevIndex = focusedTagIndex - TAGS_PER_ROW;
         if (prevIndex >= 0) {
           setFocusedTagIndex(prevIndex);
+        } else {
+          // If would go negative, jump to first tag
+          setFocusedTagIndex(0);
         }
-        // If already at top row, stay in tags (don't go anywhere)
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         setFocusedTagIndex(prev => Math.min(prev + 1, tags.length - 1));
@@ -189,8 +193,18 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
         return;
       }
       
-      // Ctrl+Enter: Start recording
-      if (e.key === 'Enter' && e.ctrlKey) {
+      // Arrow down: move to tags
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        tagsContainerRef.current?.focus();
+        if (focusedTagIndex === -1 && tags && tags.length > 0) {
+          setFocusedTagIndex(0);
+        }
+        return;
+      }
+      
+      // Enter: Start recording (no need for Ctrl)
+      if (e.key === 'Enter') {
         e.preventDefault();
         handleSave();
         return;
