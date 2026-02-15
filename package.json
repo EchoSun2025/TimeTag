@@ -53,7 +53,7 @@
     "appId": "com.timetag.app",
     "productName": "TimeTag",
     "directories": {
-      "output": "dist"
+      "output": "release"
     },
     "files": [
       "dist-electron/**/*",
@@ -66,7 +66,8 @@
           "arch": ["x64"]
         }
       ],
-      "artifactName": "${productName}-${version}-Portable.${ext}"
+      "artifactName": "${productName}-${version}-Portable.${ext}",
+      "signAndEditExecutable": false
     },
     "linux": {
       "target": [
