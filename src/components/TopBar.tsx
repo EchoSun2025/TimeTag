@@ -74,7 +74,7 @@ function TopBar() {
         await db.records.update(record.id, updates);
       }
     } else {
-      // Turning OFF: Restore original times
+      // Turning OFF: Restore original times and clear them
       const allRecords = await db.records.toArray();
       console.log('🔙 Disabling 15min round, restoring', allRecords.length, 'records');
       
@@ -84,9 +84,12 @@ function TopBar() {
           await db.records.update(record.id, {
             startTime: new Date(record.originalStartTime),
             endTime: new Date(record.originalEndTime),
+            // Clear original times so they can be re-saved correctly next time
+            originalStartTime: null,
+            originalEndTime: null,
             updatedAt: new Date(),
           });
-          console.log('✅ Restored record:', record.id, {
+          console.log('✅ Restored and cleared original times for record:', record.id, {
             from: { start: record.startTime, end: record.endTime },
             to: { start: record.originalStartTime, end: record.originalEndTime }
           });
