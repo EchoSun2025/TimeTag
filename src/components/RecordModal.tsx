@@ -102,32 +102,36 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Arrow up/down: navigate between fields
+    // Arrow up/down: navigate between fields (only when not typing in input)
     if (e.key === 'ArrowDown') {
-      e.preventDefault();
       if (document.activeElement === descriptionRef.current) {
+        e.preventDefault();
         startTimeRef.current?.focus();
       } else if (document.activeElement === startTimeRef.current) {
+        e.preventDefault();
         endTimeRef.current?.focus();
       } else if (document.activeElement === endTimeRef.current) {
+        e.preventDefault();
         tagsContainerRef.current?.focus();
         if (tags && tags.length > 0) {
           setFocusedTagIndex(0);
         }
       }
     } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
       if (document.activeElement === endTimeRef.current) {
+        e.preventDefault();
         startTimeRef.current?.focus();
       } else if (document.activeElement === startTimeRef.current) {
+        e.preventDefault();
         descriptionRef.current?.focus();
       } else if (document.activeElement === tagsContainerRef.current) {
+        e.preventDefault();
         endTimeRef.current?.focus();
         setFocusedTagIndex(-1);
       }
     }
     
-    // Arrow left/right: navigate tags
+    // Arrow left/right: navigate tags (only in tags container)
     if (document.activeElement === tagsContainerRef.current && tags) {
       if (e.key === 'ArrowRight') {
         e.preventDefault();
@@ -143,8 +147,11 @@ function RecordModal({ isOpen, onClose, initialStartTime, initialEndTime, editRe
       }
     }
 
-    // Enter to save (when not in tags container)
-    if (e.key === 'Enter' && document.activeElement !== tagsContainerRef.current) {
+    // Enter to save (only from datetime inputs or tags container, NOT from description input)
+    if (e.key === 'Enter' && 
+        (document.activeElement === startTimeRef.current || 
+         document.activeElement === endTimeRef.current ||
+         document.activeElement === tagsContainerRef.current)) {
       e.preventDefault();
       handleSave();
     }
