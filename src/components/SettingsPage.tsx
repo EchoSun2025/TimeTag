@@ -86,6 +86,7 @@ const TagEditor = React.memo(({
           Tag Name
         </label>
         <input
+          key={selectedTagId}  // Force re-mount when tag changes
           ref={nameInputRef}
           type="text"
           value={editName}
@@ -96,6 +97,7 @@ const TagEditor = React.memo(({
           onFocus={() => console.log('📌 Name input received focus event')}
           onBlur={() => console.log('💨 Name input lost focus event (blur)')}
           onClick={() => console.log('🖱️ Input clicked')}
+          autoFocus
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
