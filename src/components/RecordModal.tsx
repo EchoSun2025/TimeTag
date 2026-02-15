@@ -131,8 +131,18 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
         if (nextIndex < tags.length) {
           setFocusedTagIndex(nextIndex);
         } else {
-          // If would go past end, jump to last tag
-          setFocusedTagIndex(tags.length - 1);
+          // If would go past end, check if we're on the last row
+          const currentRow = Math.floor(focusedTagIndex / TAGS_PER_ROW);
+          const totalRows = Math.ceil(tags.length / TAGS_PER_ROW);
+          const lastRow = totalRows - 1;
+          
+          if (currentRow === lastRow) {
+            // Already on last row, move to description
+            descriptionRef.current?.focus();
+          } else {
+            // Not on last row yet, jump to last tag
+            setFocusedTagIndex(tags.length - 1);
+          }
         }
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
