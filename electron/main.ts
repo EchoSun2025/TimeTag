@@ -41,7 +41,7 @@ function createMainWindow() {
 function createMiniWindow() {
   miniWindow = new BrowserWindow({
     width: 252,
-    height: 84,  // Reduced from 142 to original compact size
+    height: 55,  // Reduced to 55px for more compact size
     x: 20,  // Position at left
     y: 20,  // Position at top
     frame: false,
