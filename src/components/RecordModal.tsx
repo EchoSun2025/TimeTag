@@ -119,76 +119,85 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Arrow left/right: cycle through sub-items when description is focused
-    if (document.activeElement === descriptionRef.current && subItems.length > 0) {
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        const nextIndex = (currentSubItemIndex + 1) % subItems.length;
-        setCurrentSubItemIndex(nextIndex);
-        setDescription(subItems[nextIndex]);
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        const prevIndex = currentSubItemIndex === 0 ? subItems.length - 1 : currentSubItemIndex - 1;
-        setCurrentSubItemIndex(prevIndex);
-        setDescription(subItems[prevIndex]);
-      }
-    }
-    
-    // Arrow up/down: navigate between description and tags
-    if (e.key === 'ArrowDown') {
-      if (document.activeElement === descriptionRef.current) {
-        e.preventDefault();
-        tagsContainerRef.current?.focus();
-        if (focusedTagIndex === -1 && tags && tags.length > 0) {
-          setFocusedTagIndex(0);
-        }
-      }
-    } else if (e.key === 'ArrowUp') {
-      if (document.activeElement === descriptionRef.current) {
-        e.preventDefault();
-        tagsContainerRef.current?.focus();
-        if (focusedTagIndex === -1 && tags && tags.length > 0) {
-          setFocusedTagIndex(0);
-        }
-      } else if (document.activeElement === tagsContainerRef.current) {
-        e.preventDefault();
-        descriptionRef.current?.focus();
-        setFocusedTagIndex(-1);
-      }
-    }
-    
-    // Arrow left/right: navigate tags in tags container
+    // In tags container
     if (document.activeElement === tagsContainerRef.current && tags) {
-      if (e.key === 'ArrowRight') {
+      // Arrow up/down/left/right: navigate tags (2D grid)
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        // Move down to next row (try +3 for typical 3-column layout)
+        const nextIndex = focusedTagIndex + 3;
+        if (nextIndex < tags.length) {
+          setFocusedTagIndex(nextIndex);
+        } else {
+          // If no tag below, move to description
+          descriptionRef.current?.focus();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        // Move up to previous row
+        const prevIndex = focusedTagIndex - 3;
+        if (prevIndex >= 0) {
+          setFocusedTagIndex(prevIndex);
+        }
+        // If already at top row, stay in tags (don't go anywhere)
+      } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         setFocusedTagIndex(prev => Math.min(prev + 1, tags.length - 1));
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         setFocusedTagIndex(prev => Math.max(prev - 1, 0));
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (focusedTagIndex >= 0 && focusedTagIndex < tags.length) {
-          handleTagToggle(tags[focusedTagIndex].id);
-          // Move to description after selecting
-          setTimeout(() => {
-            descriptionRef.current?.focus();
-          }, 0);
-        }
       } else if (e.key === ' ') {
+        // Space: Select tag and stay in tags
         e.preventDefault();
         if (focusedTagIndex >= 0 && focusedTagIndex < tags.length) {
           handleTagToggle(tags[focusedTagIndex].id);
         }
+      } else if (e.key === 'Enter') {
+        // Enter: Start recording directly
+        e.preventDefault();
+        handleSave();
+      }
+      return; // Exit early for tags container
+    }
+    
+    // In description input
+    if (document.activeElement === descriptionRef.current) {
+      // Arrow left/right: cycle through sub-items (if available)
+      if (subItems.length > 0) {
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          const nextIndex = (currentSubItemIndex + 1) % subItems.length;
+          setCurrentSubItemIndex(nextIndex);
+          setDescription(subItems[nextIndex]);
+          return;
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const prevIndex = currentSubItemIndex === 0 ? subItems.length - 1 : currentSubItemIndex - 1;
+          setCurrentSubItemIndex(prevIndex);
+          setDescription(subItems[prevIndex]);
+          return;
+        }
+      }
+      
+      // Arrow up: move to tags
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        tagsContainerRef.current?.focus();
+        if (focusedTagIndex === -1 && tags && tags.length > 0) {
+          setFocusedTagIndex(0);
+        }
+        return;
+      }
+      
+      // Ctrl+Enter: Start recording
+      if (e.key === 'Enter' && e.ctrlKey) {
+        e.preventDefault();
+        handleSave();
+        return;
       }
     }
 
-    // Ctrl+Enter to save from anywhere
-    if (e.key === 'Enter' && e.ctrlKey) {
-      e.preventDefault();
-      handleSave();
-    }
-
-    // Escape to close
+    // Escape to close (works from anywhere)
     if (e.key === 'Escape') {
       e.preventDefault();
       handleClose();
@@ -254,7 +263,7 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
               ))}
             </div>
             <div className="text-xs text-gray-400 mt-2">
-              Use ↑ ↓ to navigate, ← → in tags area or Enter/Space to select
+              Use ↑ ↓ ← → to navigate tags, Space to select, Enter to start recording
             </div>
           </div>
 
@@ -306,7 +315,7 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
               {editRecord ? 'Update' : 'Start Recording'}
             </button>
             <div className="text-xs text-gray-400">
-              Ctrl+Enter
+              Enter
             </div>
           </div>
         </div>
