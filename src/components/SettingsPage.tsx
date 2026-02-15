@@ -302,13 +302,20 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   }, [selectedTag]);
 
   const handleTagSelect = React.useCallback((tag: Tag) => {
-    console.log('👆 handleTagSelect called', { tagId: tag.id, tagName: tag.name });
+    console.log('👆 handleTagSelect called', { tagId: tag.id, tagName: tag.name, currentSelectedId: selectedTag?.id });
+    
+    // If clicking the same tag, don't reset states (prevents losing focus)
+    if (selectedTag?.id === tag.id) {
+      console.log('⏭️ Same tag selected, skipping state reset');
+      return;
+    }
+    
     setSelectedTag(tag);
     setEditName(tag.name);
     setEditIsLeisure(tag.isLeisure ?? false);
     setEditSubItems((tag.subItems || []).join('\n'));
     setEditSchedules(tag.recurringSchedules || []);
-  }, []);
+  }, [selectedTag]);
 
   const handleSave = React.useCallback(async () => {
     console.log('💾 handleSave called', {
