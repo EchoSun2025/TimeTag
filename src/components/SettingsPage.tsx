@@ -205,7 +205,24 @@ const TagEditor = React.memo(({
   );
 });
 
+// Custom comparison function - only compare value props, not function props
 TagEditor.displayName = 'TagEditor';
+const arePropsEqual = (
+  prevProps: any,
+  nextProps: any
+) => {
+  // Only compare the actual data, not the functions
+  return (
+    prevProps.selectedTagId === nextProps.selectedTagId &&
+    prevProps.editName === nextProps.editName &&
+    prevProps.editIsLeisure === nextProps.editIsLeisure &&
+    prevProps.editSubItems === nextProps.editSubItems &&
+    JSON.stringify(prevProps.editSchedules) === JSON.stringify(nextProps.editSchedules)
+  );
+};
+
+// Wrap with custom comparison
+const MemoizedTagEditor = React.memo(TagEditor, arePropsEqual);
 
 function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const tags = useLiveQuery(() => db.tags.toArray(), []);
@@ -245,16 +262,16 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     });
   }, [selectedTag]);
 
-  const handleTagSelect = (tag: Tag) => {
+  const handleTagSelect = React.useCallback((tag: Tag) => {
     console.log('👆 handleTagSelect called', { tagId: tag.id, tagName: tag.name });
     setSelectedTag(tag);
     setEditName(tag.name);
     setEditIsLeisure(tag.isLeisure ?? false);
     setEditSubItems((tag.subItems || []).join('\n'));
     setEditSchedules(tag.recurringSchedules || []);
-  };
+  }, []);
 
-  const handleSave = async () => {
+  const handleSave = React.useCallback(async () => {
     console.log('💾 handleSave called', {
       selectedTagId: selectedTag?.id,
       editName,
@@ -284,13 +301,13 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     await db.tags.update(selectedTag.id, updateData);
     console.log('✅ Save completed', { tagId: selectedTag.id, updateData });
     // Don't update any local state - keep everything as is to maintain focus
-  };
+  }, [selectedTag, editName, editIsLeisure, editSubItems, editSchedules]);
 
-  const handleCancel = () => {
+  const handleCancel = React.useCallback(() => {
     setSelectedTag(null);
-  };
+  }, []);
 
-  const handleAddSchedule = () => {
+  const handleAddSchedule = React.useCallback(() => {
     setEditSchedules([
       ...editSchedules,
       {
@@ -301,13 +318,13 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
         endMinute: 0,
       },
     ]);
-  };
+  }, [editSchedules]);
 
-  const handleRemoveSchedule = (index: number) => {
+  const handleRemoveSchedule = React.useCallback((index: number) => {
     setEditSchedules(editSchedules.filter((_, i) => i !== index));
-  };
+  }, [editSchedules]);
 
-  const handleScheduleChange = (
+  const handleScheduleChange = React.useCallback((
     index: number,
     field: keyof RecurringSchedule,
     value: string | number
@@ -317,9 +334,12 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     const numValue = typeof value === 'string' ? (value === '' ? 0 : parseInt(value)) : value;
     updated[index] = { ...updated[index], [field]: isNaN(numValue) ? 0 : numValue };
     setEditSchedules(updated);
-  };
+  }, [editSchedules]);
 
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayNames = React.useMemo(() => 
+    ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    []
+  );
 
   if (!isOpen) return null;
 
@@ -388,7 +408,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
           {/* Right side - Tag editor */}
           <div className="flex-1 overflow-y-auto p-6">
             {selectedTag ? (
-              <TagEditor
+              <MemoizedTagEditor
                 selectedTagId={selectedTag.id}
                 editName={editName}
                 setEditName={setEditName}
