@@ -10,6 +10,203 @@ interface SettingsPageProps {
 
 const LEISURE_GREEN = '#86EFAC'; // Light green color for leisure tags
 
+// Memoized editor component to prevent re-renders when tags update
+const TagEditor = React.memo(({ 
+  selectedTagId,
+  editName,
+  setEditName,
+  editIsLeisure,
+  setEditIsLeisure,
+  editSubItems,
+  setEditSubItems,
+  editSchedules,
+  setEditSchedules,
+  handleAddSchedule,
+  handleRemoveSchedule,
+  handleScheduleChange,
+  handleSave,
+  handleCancel,
+  dayNames
+}: {
+  selectedTagId: string;
+  editName: string;
+  setEditName: (v: string) => void;
+  editIsLeisure: boolean;
+  setEditIsLeisure: (v: boolean) => void;
+  editSubItems: string;
+  setEditSubItems: (v: string) => void;
+  editSchedules: RecurringSchedule[];
+  setEditSchedules: (v: RecurringSchedule[]) => void;
+  handleAddSchedule: () => void;
+  handleRemoveSchedule: (index: number) => void;
+  handleScheduleChange: (index: number, field: keyof RecurringSchedule, value: string | number) => void;
+  handleSave: () => void;
+  handleCancel: () => void;
+  dayNames: string[];
+}) => {
+  console.log('🎨 TagEditor rendered', { selectedTagId, editName, timestamp: new Date().toISOString() });
+  
+  return (
+    <div className="space-y-6">
+      {/* Tag Name */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Tag Name
+        </label>
+        <input
+          type="text"
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Leisure Tag Toggle */}
+      <div>
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={editIsLeisure}
+            onChange={(e) => setEditIsLeisure(e.target.checked)}
+            className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+          />
+          <div>
+            <div className="font-medium text-gray-700">Leisure Tag</div>
+            <div className="text-sm text-gray-500">
+              Leisure tags are not counted in total hours and will be light green
+            </div>
+          </div>
+        </label>
+      </div>
+
+      {/* Sub-items */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Sub-items
+          <span className="text-xs text-gray-400 ml-2">
+            (One per line)
+          </span>
+        </label>
+        <textarea
+          value={editSubItems}
+          onChange={(e) => setEditSubItems(e.target.value)}
+          placeholder="e.g., for 'Work' tag:&#10;Can's work&#10;FX work&#10;Art work"
+          rows={6}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+        />
+      </div>
+
+      {/* Recurring Schedules */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Fixed Time Schedules
+          </label>
+          <button
+            onClick={handleAddSchedule}
+            className="text-sm px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            + Add Schedule
+          </button>
+        </div>
+        <div className="text-xs text-gray-500 mb-3">
+          Automatically create time blocks for this tag on specific days
+        </div>
+
+        <div className="space-y-3">
+          {editSchedules.map((schedule, index) => (
+            <div key={index} className="border border-gray-200 rounded-md p-3 bg-gray-50">
+              <div className="flex items-center gap-2 mb-2">
+                <select
+                  value={schedule.dayOfWeek}
+                  onChange={(e) => handleScheduleChange(index, 'dayOfWeek', parseInt(e.target.value))}
+                  className="px-2 py-1 border border-gray-300 rounded text-sm"
+                >
+                  {dayNames.map((day, i) => (
+                    <option key={i} value={i}>{day}</option>
+                  ))}
+                </select>
+
+                <input
+                  type="number"
+                  min="0"
+                  max="23"
+                  value={schedule.startHour}
+                  onChange={(e) => handleScheduleChange(index, 'startHour', e.target.value)}
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                />
+                <span>:</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={schedule.startMinute}
+                  onChange={(e) => handleScheduleChange(index, 'startMinute', e.target.value)}
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                />
+
+                <span className="text-gray-500">to</span>
+
+                <input
+                  type="number"
+                  min="0"
+                  max="23"
+                  value={schedule.endHour}
+                  onChange={(e) => handleScheduleChange(index, 'endHour', e.target.value)}
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                />
+                <span>:</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={schedule.endMinute}
+                  onChange={(e) => handleScheduleChange(index, 'endMinute', e.target.value)}
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                />
+
+                <button
+                  onClick={() => handleRemoveSchedule(index)}
+                  className="ml-auto text-red-500 hover:text-red-700"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="text-xs text-gray-600">
+                {dayNames[schedule.dayOfWeek]} {String(schedule.startHour).padStart(2, '0')}:{String(schedule.startMinute).padStart(2, '0')} - {String(schedule.endHour).padStart(2, '0')}:{String(schedule.endMinute).padStart(2, '0')}
+              </div>
+            </div>
+          ))}
+
+          {editSchedules.length === 0 && (
+            <div className="text-sm text-gray-400 text-center py-4">
+              No fixed schedules. Click "+ Add Schedule" to create one.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+        <button
+          onClick={handleSave}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+        >
+          Save Changes
+        </button>
+        <button
+          onClick={handleCancel}
+          className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+});
+
+TagEditor.displayName = 'TagEditor';
+
 function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const tags = useLiveQuery(() => db.tags.toArray(), []);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
@@ -191,161 +388,23 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
           {/* Right side - Tag editor */}
           <div className="flex-1 overflow-y-auto p-6">
             {selectedTag ? (
-              <div className="space-y-6">
-                {/* Tag Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tag Name
-                  </label>
-                  <input
-                    type="text"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                {/* Leisure Tag Toggle */}
-                <div>
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={editIsLeisure}
-                      onChange={(e) => setEditIsLeisure(e.target.checked)}
-                      className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <div>
-                      <div className="font-medium text-gray-700">Leisure Tag</div>
-                      <div className="text-sm text-gray-500">
-                        Leisure tags are not counted in total hours and will be light green
-                      </div>
-                    </div>
-                  </label>
-                </div>
-
-                {/* Sub-items */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Sub-items
-                    <span className="text-xs text-gray-400 ml-2">
-                      (One per line)
-                    </span>
-                  </label>
-                  <textarea
-                    value={editSubItems}
-                    onChange={(e) => setEditSubItems(e.target.value)}
-                    placeholder="e.g., for 'Work' tag:&#10;Can's work&#10;FX work&#10;Art work"
-                    rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                  />
-                </div>
-
-                {/* Recurring Schedules */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Fixed Time Schedules
-                    </label>
-                    <button
-                      onClick={handleAddSchedule}
-                      className="text-sm px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      + Add Schedule
-                    </button>
-                  </div>
-                  <div className="text-xs text-gray-500 mb-3">
-                    Automatically create time blocks for this tag on specific days
-                  </div>
-
-                  <div className="space-y-3">
-                    {editSchedules.map((schedule, index) => (
-                      <div key={index} className="border border-gray-200 rounded-md p-3 bg-gray-50">
-                        <div className="flex items-center gap-2 mb-2">
-                          <select
-                            value={schedule.dayOfWeek}
-                            onChange={(e) => handleScheduleChange(index, 'dayOfWeek', parseInt(e.target.value))}
-                            className="px-2 py-1 border border-gray-300 rounded text-sm"
-                          >
-                            {dayNames.map((day, i) => (
-                              <option key={i} value={i}>{day}</option>
-                            ))}
-                          </select>
-
-                          <input
-                            type="number"
-                            min="0"
-                            max="23"
-                            value={schedule.startHour}
-                            onChange={(e) => handleScheduleChange(index, 'startHour', e.target.value)}
-                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-                          <span>:</span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="59"
-                            value={schedule.startMinute}
-                            onChange={(e) => handleScheduleChange(index, 'startMinute', e.target.value)}
-                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-
-                          <span className="text-gray-500">to</span>
-
-                          <input
-                            type="number"
-                            min="0"
-                            max="23"
-                            value={schedule.endHour}
-                            onChange={(e) => handleScheduleChange(index, 'endHour', e.target.value)}
-                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-                          <span>:</span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="59"
-                            value={schedule.endMinute}
-                            onChange={(e) => handleScheduleChange(index, 'endMinute', e.target.value)}
-                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-
-                          <button
-                            onClick={() => handleRemoveSchedule(index)}
-                            className="ml-auto text-red-500 hover:text-red-700"
-                          >
-                            ×
-                          </button>
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {dayNames[schedule.dayOfWeek]} {String(schedule.startHour).padStart(2, '0')}:{String(schedule.startMinute).padStart(2, '0')} - {String(schedule.endHour).padStart(2, '0')}:{String(schedule.endMinute).padStart(2, '0')}
-                        </div>
-                      </div>
-                    ))}
-
-                    {editSchedules.length === 0 && (
-                      <div className="text-sm text-gray-400 text-center py-4">
-                        No fixed schedules. Click "+ Add Schedule" to create one.
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
-                  <button
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-                  >
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+              <TagEditor
+                selectedTagId={selectedTag.id}
+                editName={editName}
+                setEditName={setEditName}
+                editIsLeisure={editIsLeisure}
+                setEditIsLeisure={setEditIsLeisure}
+                editSubItems={editSubItems}
+                setEditSubItems={setEditSubItems}
+                editSchedules={editSchedules}
+                setEditSchedules={setEditSchedules}
+                handleAddSchedule={handleAddSchedule}
+                handleRemoveSchedule={handleRemoveSchedule}
+                handleScheduleChange={handleScheduleChange}
+                handleSave={handleSave}
+                handleCancel={handleCancel}
+                dayNames={dayNames}
+              />
             ) : (
               <div className="flex items-center justify-center h-full text-gray-400">
                 <div className="text-center">
