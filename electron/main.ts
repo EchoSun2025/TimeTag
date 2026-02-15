@@ -23,8 +23,8 @@ function createMainWindow() {
     },
   });
 
-  // Maximize window on startup
-  mainWindow.maximize();
+  // Set fullscreen on startup
+  mainWindow.setFullScreen(true);
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');

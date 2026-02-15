@@ -262,7 +262,7 @@ const TagEditor = React.memo(({
           onClick={handleSave}
           className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
         >
-          Save Changes
+          Close
         </button>
         <button
           onClick={handleCancel}
@@ -337,7 +337,8 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     setEditSchedules(tag.recurringSchedules || []);
   }, [selectedTag]);
 
-  const handleSave = React.useCallback(async () => {
+  // Auto-save whenever edit states change
+  React.useEffect(() => {
     if (!selectedTag) return;
 
     const subItems = editSubItems
@@ -359,9 +360,13 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       setEditColor(LEISURE_GREEN);
     }
 
-    await db.tags.update(selectedTag.id, updateData);
-    // Don't update any local state - keep everything as is to maintain focus
+    db.tags.update(selectedTag.id, updateData);
   }, [selectedTag, editName, editIsLeisure, editColor, editSubItems, editSchedules]);
+
+  const handleSave = React.useCallback(() => {
+    // "Save Changes" now just closes the window since all changes are auto-saved
+    onClose();
+  }, [onClose]);
 
   const handleCancel = React.useCallback(() => {
     setSelectedTag(null);

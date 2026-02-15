@@ -76,17 +76,10 @@ export async function initializeDefaultSettings() {
 export async function initializeDefaultTags() {
   const existingTags = await db.tags.toArray();
   if (existingTags.length === 0) {
-    const LEISURE_GREEN = '#86EFAC';
     const defaultTags: Omit<Tag, 'id'>[] = [
       { name: 'Work', color: '#4285F4', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
-      { name: 'Study', color: '#34A853', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
+      { name: 'Lunch', color: '#34A853', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
       { name: 'Meeting', color: '#EA4335', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
-      { name: 'Break', color: LEISURE_GREEN, isActive: true, isLeisure: true, subItems: [], recurringSchedules: [], createdAt: new Date() },
-      { name: 'Exercise', color: LEISURE_GREEN, isActive: true, isLeisure: true, subItems: [], recurringSchedules: [], createdAt: new Date() },
-      { name: 'Reading', color: '#A142F4', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
-      { name: 'Meal', color: LEISURE_GREEN, isActive: true, isLeisure: true, subItems: [], recurringSchedules: [], createdAt: new Date() },
-      { name: 'Social', color: LEISURE_GREEN, isActive: true, isLeisure: true, subItems: [], recurringSchedules: [], createdAt: new Date() },
-      { name: 'Other', color: '#5E6FE1', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
     ];
 
     for (const tag of defaultTags) {
