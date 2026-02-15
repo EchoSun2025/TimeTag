@@ -46,6 +46,16 @@ const TagEditor = React.memo(({
 }) => {
   console.log('🎨 TagEditor rendered', { selectedTagId, editName, timestamp: new Date().toISOString() });
   
+  // Auto-focus on name input when editor opens
+  const nameInputRef = React.useRef<HTMLInputElement>(null);
+  React.useEffect(() => {
+    console.log('🎯 TagEditor mounted/updated, attempting to focus', { selectedTagId });
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
+      console.log('✅ Focus set on name input');
+    }
+  }, [selectedTagId]); // Re-focus when tag changes
+  
   return (
     <div className="space-y-6">
       {/* Tag Name */}
@@ -54,6 +64,7 @@ const TagEditor = React.memo(({
           Tag Name
         </label>
         <input
+          ref={nameInputRef}
           type="text"
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
