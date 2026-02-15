@@ -23,6 +23,9 @@ function createMainWindow() {
     },
   });
 
+  // Maximize window on startup
+  mainWindow.maximize();
+
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();

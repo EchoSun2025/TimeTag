@@ -18,6 +18,7 @@ function Timeline() {
   const [modalEndTime, setModalEndTime] = useState<Date | undefined>();
   const [editingRecord, setEditingRecord] = useState<TimeRecord | undefined>();
   const [activeBlockNow, setActiveBlockNow] = useState<Date>(new Date());
+  const [now, setNow] = useState<Date>(new Date());
 
   // Fetch records for current date
   const records = useLiveQuery(async () => {
@@ -58,6 +59,16 @@ function Timeline() {
 
     return () => clearInterval(interval);
   }, [activeRecord]);
+
+  // Update current time every minute
+  useEffect(() => {
+    // Update every minute
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Check if active record is on the currently viewed day
   const activeRecordOnCurrentDay = useMemo(() => {
@@ -195,6 +206,24 @@ function Timeline() {
     }
   };
 
+  const handleScrollToNow = () => {
+    if (!containerRef.current) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const viewportHeight = rect.height;
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentTimeMinutes = currentHour * 60 + currentMinute;
+    
+    // Calculate position of current time
+    const nowY = (currentTimeMinutes / 60) * heightPerHour;
+    
+    // Center the view on current time
+    const newScrollTop = nowY - viewportHeight / 2 + 16;
+    
+    containerRef.current.scrollTop = newScrollTop;
+  };
+
   // Generate full 24 hours (0-23)
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -258,6 +287,13 @@ function Timeline() {
     <div className="h-full flex flex-col bg-yellow-50 relative">
       {/* Floating zoom controls */}
       <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+        <button
+          onClick={handleScrollToNow}
+          className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-all text-xl"
+          title="Scroll to current time"
+        >
+          ·
+        </button>
         <button
           onClick={handleZoomOut}
           disabled={timelineZoom <= 1}
@@ -325,6 +361,25 @@ function Timeline() {
               className="absolute inset-0 cursor-crosshair"
               onDoubleClick={handleDoubleClick}
             />
+            
+            {/* Current time indicator line */}
+            {(() => {
+              const currentHour = now.getHours();
+              const currentMinute = now.getMinutes();
+              const currentTimeMinutes = currentHour * 60 + currentMinute;
+              const nowTop = (currentTimeMinutes / 60) * heightPerHour;
+              
+              return (
+                <div
+                  className="absolute left-0 right-0 pointer-events-none z-20"
+                  style={{ top: `${nowTop}px` }}
+                >
+                  <div className="h-0.5 bg-red-500 relative">
+                    <div className="absolute -left-2 -top-2 w-4 h-4 bg-red-500 rounded-full" />
+                  </div>
+                </div>
+              );
+            })()}
             
             {/* Render time blocks with overlap support (skip the virtual active record) */}
             {recordsWithLayout && tags && recordsWithLayout.map(record => {

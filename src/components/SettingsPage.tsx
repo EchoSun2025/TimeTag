@@ -10,6 +10,25 @@ interface SettingsPageProps {
 
 const LEISURE_GREEN = '#86EFAC'; // Light green color for leisure tags
 
+const TAG_COLORS = [
+  '#EF4444', // Red
+  '#F97316', // Orange
+  '#F59E0B', // Amber
+  '#EAB308', // Yellow
+  '#84CC16', // Lime
+  '#22C55E', // Green
+  '#10B981', // Emerald
+  '#14B8A6', // Teal
+  '#06B6D4', // Cyan
+  '#0EA5E9', // Sky
+  '#3B82F6', // Blue
+  '#6366F1', // Indigo
+  '#8B5CF6', // Violet
+  '#A855F7', // Purple
+  '#D946EF', // Fuchsia
+  '#EC4899', // Pink
+];
+
 // Memoized editor component to prevent re-renders when tags update
 const TagEditor = React.memo(({ 
   selectedTagId,
@@ -17,6 +36,8 @@ const TagEditor = React.memo(({
   setEditName,
   editIsLeisure,
   setEditIsLeisure,
+  editColor,
+  setEditColor,
   editSubItems,
   setEditSubItems,
   editSchedules,
@@ -26,6 +47,7 @@ const TagEditor = React.memo(({
   handleScheduleChange,
   handleSave,
   handleCancel,
+  handleDelete,
   dayNames
 }: {
   selectedTagId: string;
@@ -33,6 +55,8 @@ const TagEditor = React.memo(({
   setEditName: (v: string) => void;
   editIsLeisure: boolean;
   setEditIsLeisure: (v: boolean) => void;
+  editColor: string;
+  setEditColor: (v: string) => void;
   editSubItems: string;
   setEditSubItems: (v: string) => void;
   editSchedules: RecurringSchedule[];
@@ -42,6 +66,7 @@ const TagEditor = React.memo(({
   handleScheduleChange: (index: number, field: keyof RecurringSchedule, value: string | number) => void;
   handleSave: () => void;
   handleCancel: () => void;
+  handleDelete: () => void;
   dayNames: string[];
 }) => {
   // Auto-focus on name input when editor opens
@@ -99,6 +124,29 @@ const TagEditor = React.memo(({
             </div>
           </div>
         </label>
+      </div>
+
+      {/* Color Selection */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Tag Color
+        </label>
+        <div className="grid grid-cols-8 gap-2">
+          {TAG_COLORS.map((color) => (
+            <button
+              key={color}
+              type="button"
+              onClick={() => setEditColor(color)}
+              className={`w-10 h-10 rounded-full transition-all ${
+                editColor === color 
+                  ? 'ring-2 ring-offset-2 ring-blue-500 scale-110' 
+                  : 'hover:scale-110'
+              }`}
+              style={{ backgroundColor: color }}
+              title={color}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Sub-items */}
@@ -222,6 +270,12 @@ const TagEditor = React.memo(({
         >
           Cancel
         </button>
+        <button
+          onClick={handleDelete}
+          className="ml-auto px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+        >
+          Delete Tag
+        </button>
       </div>
     </div>
   );
@@ -238,6 +292,7 @@ const arePropsEqual = (
     prevProps.selectedTagId === nextProps.selectedTagId &&
     prevProps.editName === nextProps.editName &&
     prevProps.editIsLeisure === nextProps.editIsLeisure &&
+    prevProps.editColor === nextProps.editColor &&
     prevProps.editSubItems === nextProps.editSubItems &&
     JSON.stringify(prevProps.editSchedules) === JSON.stringify(nextProps.editSchedules)
   );
@@ -251,6 +306,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [editName, setEditName] = useState('');
   const [editIsLeisure, setEditIsLeisure] = useState(false);
+  const [editColor, setEditColor] = useState(TAG_COLORS[0]);
   const [editSubItems, setEditSubItems] = useState('');
   const [editSchedules, setEditSchedules] = useState<RecurringSchedule[]>([]);
   const modalRef = React.useRef<HTMLDivElement>(null);
@@ -276,6 +332,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     setSelectedTag(tag);
     setEditName(tag.name);
     setEditIsLeisure(tag.isLeisure ?? false);
+    setEditColor(tag.color);
     setEditSubItems((tag.subItems || []).join('\n'));
     setEditSchedules(tag.recurringSchedules || []);
   }, [selectedTag]);
@@ -288,26 +345,37 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       .map(item => item.trim())
       .filter(item => item.length > 0);
 
-    // Auto-change color to light green if marking as leisure
     const updateData: any = {
       name: editName,
       isLeisure: editIsLeisure,
+      color: editColor,
       subItems,
       recurringSchedules: editSchedules,
     };
 
-    // If marking as leisure, change color to light green
-    if (editIsLeisure && selectedTag.color !== LEISURE_GREEN) {
+    // If marking as leisure and not already green, change to green
+    if (editIsLeisure && editColor !== LEISURE_GREEN) {
       updateData.color = LEISURE_GREEN;
+      setEditColor(LEISURE_GREEN);
     }
 
     await db.tags.update(selectedTag.id, updateData);
     // Don't update any local state - keep everything as is to maintain focus
-  }, [selectedTag, editName, editIsLeisure, editSubItems, editSchedules]);
+  }, [selectedTag, editName, editIsLeisure, editColor, editSubItems, editSchedules]);
 
   const handleCancel = React.useCallback(() => {
     setSelectedTag(null);
   }, []);
+
+  const handleDelete = React.useCallback(async () => {
+    if (!selectedTag) return;
+    
+    const confirmed = confirm(`Are you sure you want to delete "${selectedTag.name}"? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    await db.tags.delete(selectedTag.id);
+    setSelectedTag(null);
+  }, [selectedTag]);
 
   const handleAddSchedule = React.useCallback(() => {
     setEditSchedules([
@@ -419,6 +487,8 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                 setEditName={setEditName}
                 editIsLeisure={editIsLeisure}
                 setEditIsLeisure={setEditIsLeisure}
+                editColor={editColor}
+                setEditColor={setEditColor}
                 editSubItems={editSubItems}
                 setEditSubItems={setEditSubItems}
                 editSchedules={editSchedules}
@@ -428,6 +498,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                 handleScheduleChange={handleScheduleChange}
                 handleSave={handleSave}
                 handleCancel={handleCancel}
+                handleDelete={handleDelete}
                 dayNames={dayNames}
               />
             ) : (
