@@ -15,6 +15,29 @@ function App() {
   
   // Check if we're in mini mode from URL hash
   const urlIsMiniMode = window.location.hash === '#/mini';
+  const isInMiniMode = urlIsMiniMode || isMiniMode;
+
+  // Set transparent background for mini window (must be at top level, not in conditional)
+  useEffect(() => {
+    if (isInMiniMode) {
+      document.body.style.backgroundColor = 'transparent';
+      document.documentElement.style.backgroundColor = 'transparent';
+      console.log('🔍 Mini mode DEBUG:', {
+        urlHash: window.location.hash,
+        isMiniMode,
+        bodyBg: document.body.style.backgroundColor,
+        htmlBg: document.documentElement.style.backgroundColor,
+        rootDiv: document.getElementById('root')
+      });
+    }
+    
+    return () => {
+      if (isInMiniMode) {
+        document.body.style.backgroundColor = '';
+        document.documentElement.style.backgroundColor = '';
+      }
+    };
+  }, [isInMiniMode, isMiniMode]);
 
   useEffect(() => {
     // Initialize database and load settings
@@ -61,28 +84,10 @@ function App() {
         window.electronAPI.removeAllListeners('shortcut:toggle-view');
       }
     };
-  }, [loadSettings, activeRecord, stopRecording, isMiniMode, setMiniMode]);
+  }, [loadSettings, activeRecord, stopRecording, isMiniMode, setMiniMode, isDarkMode]);
 
   // Render mini window if in mini mode
-  if (urlIsMiniMode || isMiniMode) {
-    // Set transparent background for mini window
-    useEffect(() => {
-      document.body.style.backgroundColor = 'transparent';
-      document.documentElement.style.backgroundColor = 'transparent';
-      // Add some debug info
-      console.log('🔍 Mini mode DEBUG:', {
-        urlHash: window.location.hash,
-        isMiniMode,
-        bodyBg: document.body.style.backgroundColor,
-        htmlBg: document.documentElement.style.backgroundColor,
-        rootDiv: document.getElementById('root')
-      });
-      return () => {
-        document.body.style.backgroundColor = '';
-        document.documentElement.style.backgroundColor = '';
-      };
-    }, []);
-    
+  if (isInMiniMode) {
     return (
       <div style={{ 
         backgroundColor: 'transparent',
