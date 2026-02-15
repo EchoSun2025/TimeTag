@@ -10,7 +10,7 @@ function TopBar() {
   const [isRounding, setIsRounding] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDataManagerOpen, setIsDataManagerOpen] = useState(false);
-  const { activeRecord, stopRecording, startRecording, currentDate } = useAppStore();
+  const { activeRecord, stopRecording, startRecording, currentDate, isDarkMode, setDarkMode } = useAppStore();
   
   // Get today's records to find the most recent one
   const todayRecords = useLiveQuery(async () => {
@@ -70,11 +70,11 @@ function TopBar() {
   };
 
   return (
-    <div className={`border-b border-gray-200 px-6 py-3 flex items-center justify-between transition-colors ${
-      activeRecord ? 'bg-green-50' : 'bg-gray-50'
-    }`}>
+    <div className={`px-6 py-3 flex items-center justify-between transition-colors ${
+      activeRecord ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-900'
+    }`} style={{ borderBottom: `1px solid var(--border-color)` }}>
       {/* Left: Title */}
-      <h1 className="text-2xl font-semibold">TimeTag</h1>
+      <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>TimeTag</h1>
 
       {/* Center: Current/Last Record Display */}
       {displayRecord && (
@@ -130,17 +130,38 @@ function TopBar() {
           onClick={handleToggleRounding}
           className={`px-4 py-2 text-sm border rounded-full transition-colors ${
             isRounding
-              ? 'bg-yellow-100 border-yellow-300 text-gray-900'
-              : 'border-gray-300 hover:bg-gray-100'
+              ? 'bg-yellow-100 border-yellow-300 text-gray-900 dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-200'
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
+          style={{ 
+            borderColor: isRounding ? undefined : 'var(--border-color)',
+            color: isRounding ? undefined : 'var(--text-primary)'
+          }}
         >
           15min Round {isRounding ? 'ON' : 'OFF'}
+        </button>
+
+        {/* Dark mode toggle button */}
+        <button
+          onClick={() => setDarkMode(!isDarkMode)}
+          className="px-4 py-2 text-sm border rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+          style={{ 
+            borderColor: 'var(--border-color)',
+            color: 'var(--text-primary)'
+          }}
+          title="Toggle dark mode"
+        >
+          {isDarkMode ? 'Light' : 'Dark'}
         </button>
 
         {/* Data Import/Export button */}
         <button
           onClick={() => setIsDataManagerOpen(true)}
-          className="px-4 py-2 text-sm border border-gray-300 rounded-full hover:bg-gray-100"
+          className="px-4 py-2 text-sm border rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+          style={{ 
+            borderColor: 'var(--border-color)',
+            color: 'var(--text-primary)'
+          }}
           title="Import/Export Data"
         >
           Data
@@ -149,7 +170,11 @@ function TopBar() {
         {/* Settings button */}
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="px-4 py-2 text-sm border border-gray-300 rounded-full hover:bg-gray-100"
+          className="px-4 py-2 text-sm border rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+          style={{ 
+            borderColor: 'var(--border-color)',
+            color: 'var(--text-primary)'
+          }}
           title="Settings"
         >
           Settings

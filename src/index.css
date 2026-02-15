@@ -3,8 +3,36 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light mode (default) */
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --bg-hover: #e5e7eb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --border-color: #d1d5db;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Dark mode - based on TimeRecord v1 */
+  .dark {
+    --bg-primary: #0f0f14;
+    --bg-secondary: #1a1a24;
+    --bg-tertiary: #252532;
+    --bg-hover: #2a2a3a;
+    --text-primary: #e4e4e7;
+    --text-secondary: #71717a;
+    --text-muted: #52525b;
+    --border-color: #27272a;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
   body {
     @apply font-sans antialiased;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
   }
 }
 

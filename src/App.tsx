@@ -10,7 +10,7 @@ import MiniWindow from '@/components/MiniWindow';
 import RecordModal from '@/components/RecordModal';
 
 function App() {
-  const { loadSettings, startRecording, stopRecording, activeRecord, isMiniMode, setMiniMode } = useAppStore();
+  const { loadSettings, startRecording, stopRecording, activeRecord, isMiniMode, setMiniMode, isDarkMode, setDarkMode } = useAppStore();
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   
   // Check if we're in mini mode from URL hash
@@ -23,6 +23,11 @@ function App() {
       await loadSettings();
     };
     init();
+
+    // Apply dark mode on mount if enabled
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    }
 
     // Register keyboard shortcuts
     if (window.electronAPI) {
@@ -69,26 +74,29 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white text-black overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden" style={{ 
+      backgroundColor: 'var(--bg-primary)',
+      color: 'var(--text-primary)'
+    }}>
       {/* Top bar with title and actions */}
       <TopBar />
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left side - Timeline (1/3) */}
-        <div className="w-1/3 border-r border-gray-200">
+        <div className="w-1/3" style={{ borderRight: `1px solid var(--border-color)` }}>
           <Timeline />
         </div>
 
         {/* Right side (2/3) */}
         <div className="flex-1 flex flex-col">
           {/* Top section - Day Control (auto height based on content) */}
-          <div className="border-b border-gray-200 py-6 px-8">
+          <div className="py-6 px-8" style={{ borderBottom: `1px solid var(--border-color)` }}>
             <DayControl />
           </div>
 
           {/* Middle section - Tags (reduced height, just fit content) */}
-          <div className="border-b border-gray-200 px-8 py-4">
+          <div className="px-8 py-4" style={{ borderBottom: `1px solid var(--border-color)` }}>
             <TagsSection />
           </div>
 

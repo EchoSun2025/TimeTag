@@ -20,6 +20,7 @@ interface AppState {
   // UI state
   showWeekExpanded: boolean;
   isMiniMode: boolean;
+  isDarkMode: boolean;
   
   // Actions
   setCurrentDate: (date: Date) => void;
@@ -27,6 +28,7 @@ interface AppState {
   setTimelineZoom: (zoom: number) => void;
   setShowWeekExpanded: (expanded: boolean) => void;
   setMiniMode: (mini: boolean) => void;
+  setDarkMode: (dark: boolean) => void;
   
   // Recording actions
   startRecording: (description: string, tags: string[]) => void;
@@ -48,6 +50,7 @@ export const useAppStore = create<AppState>()(
       settings: null,
       showWeekExpanded: false,
       isMiniMode: false,
+      isDarkMode: false,
       
       // Date navigation
       setCurrentDate: (date) => set({ currentDate: date }),
@@ -57,6 +60,15 @@ export const useAppStore = create<AppState>()(
       setTimelineZoom: (zoom) => set({ timelineZoom: Math.max(1, Math.min(5, zoom)) }),
       setShowWeekExpanded: (expanded) => set({ showWeekExpanded: expanded }),
       setMiniMode: (mini) => set({ isMiniMode: mini }),
+      setDarkMode: (dark) => {
+        set({ isDarkMode: dark });
+        // Apply dark mode class to document root
+        if (dark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      },
       
       // Recording
       startRecording: (description, tags) => {
@@ -160,9 +172,10 @@ export const useAppStore = create<AppState>()(
         removeItem: (name) => localStorage.removeItem(name),
       },
       partialize: (state) => ({
-        // Only persist activeRecord and isMiniMode
+        // Only persist activeRecord, isMiniMode, and isDarkMode
         activeRecord: state.activeRecord,
         isMiniMode: state.isMiniMode,
+        isDarkMode: state.isDarkMode,
       }),
     }
   )
