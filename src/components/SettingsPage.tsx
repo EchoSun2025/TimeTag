@@ -61,6 +61,15 @@ const TagEditor = React.memo(({
           activeElement: document.activeElement?.tagName,
           activeElementClass: document.activeElement?.className
         });
+        
+        // Check again after 100ms to see if focus was stolen
+        setTimeout(() => {
+          console.log('🔍 Focus check after 100ms:', {
+            stillHasFocus: document.activeElement === nameInputRef.current,
+            activeElement: document.activeElement?.tagName,
+            inputElement: nameInputRef.current?.tagName
+          });
+        }, 100);
       } else {
         console.log('❌ nameInputRef.current is null');
       }
@@ -80,9 +89,13 @@ const TagEditor = React.memo(({
           ref={nameInputRef}
           type="text"
           value={editName}
-          onChange={(e) => setEditName(e.target.value)}
-          onFocus={() => console.log('📌 Name input received focus')}
-          onBlur={() => console.log('📌 Name input lost focus')}
+          onChange={(e) => {
+            console.log('✏️ Input changed:', e.target.value);
+            setEditName(e.target.value);
+          }}
+          onFocus={() => console.log('📌 Name input received focus event')}
+          onBlur={() => console.log('💨 Name input lost focus event (blur)')}
+          onClick={() => console.log('🖱️ Input clicked')}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
