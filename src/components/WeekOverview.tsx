@@ -194,7 +194,11 @@ function WeekOverview() {
       {/* Week navigation */}
       <div className="flex items-center gap-4 mb-6">
         {/* Week date navigation with background card */}
-        <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
+        <div className="rounded-lg px-6 py-4 flex items-center gap-4" style={{
+          backgroundColor: 'var(--accent-bg)',
+          borderWidth: '1px',
+          borderColor: 'var(--accent-border)'
+        }}>
           <button
             onClick={handlePrevPeriod}
             className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
@@ -215,38 +219,55 @@ function WeekOverview() {
         </div>
 
         {/* View mode buttons */}
-        <div className="flex bg-yellow-50/50 border border-yellow-200 rounded-full overflow-hidden">
+        <div className="flex rounded-full overflow-hidden" style={{
+          backgroundColor: 'var(--accent-bg)',
+          borderWidth: '1px',
+          borderColor: 'var(--accent-border)'
+        }}>
           <button
             onClick={jumpToThisWeek}
-            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-r border-yellow-200"
+            className="px-6 py-2.5 text-base transition-colors"
+            style={{
+              color: 'var(--text-primary)',
+              borderRight: `1px solid var(--accent-border)`
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
             This Week
           </button>
           <button
             onClick={toggleWeekDays}
-            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors"
+            className="px-6 py-2.5 text-base transition-colors"
+            style={{ color: 'var(--text-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
             {viewMode === '5days' ? '7 Days' : '5 Days'}
           </button>
         </div>
 
         {/* Week total card with tag breakdown */}
-        <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">
+        <div className="rounded-lg p-4 flex items-center gap-6" style={{
+          backgroundColor: 'var(--accent-bg)',
+          borderWidth: '1px',
+          borderColor: 'var(--accent-border)'
+        }}>
           <div>
-            <div className="text-sm text-gray-600 mb-1">Week Total</div>
-            <div className="text-3xl font-semibold">{weekTotalTime.hours}h {weekTotalTime.minutes}m</div>
+            <div className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Week Total</div>
+            <div className="text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>{weekTotalTime.hours}h {weekTotalTime.minutes}m</div>
           </div>
           
           {/* Tag breakdown inline */}
           {weekTagBreakdown.length > 0 && (
-            <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
+            <div className="flex items-center gap-4 pl-6" style={{ borderLeft: `1px solid var(--border-color)` }}>
               {weekTagBreakdown.slice(0, 5).map((tag) => (
                 <div key={tag.name} className="flex items-center gap-2">
                   <div 
                     className="w-3 h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: tag.color }}
                   />
-                  <span className="font-mono text-base">{tag.hours}h {tag.minutes}m</span>
+                  <span className="font-mono text-base" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
                 </div>
               ))}
             </div>
@@ -273,33 +294,33 @@ function WeekOverview() {
               .filter(Boolean) as Array<{ color: string; hours: number; minutes: number }>;
 
             return (
-              <div key={index} className="border border-gray-200 rounded p-3 text-sm">
+              <div key={index} className="border rounded p-3 text-sm" style={{ borderColor: 'var(--border-color)' }}>
                 {/* Day header */}
-                <div className="font-semibold mb-2 text-center">
+                <div className="font-semibold mb-2 text-center" style={{ color: 'var(--text-primary)' }}>
                   {format(day, 'EEE')} {format(day, 'MM/dd')}
                 </div>
 
                 {dayStats.records.length === 0 ? (
-                  <div className="text-xs text-gray-400 text-center py-4">No records</div>
+                  <div className="text-xs text-center py-4" style={{ color: 'var(--text-muted)' }}>No records</div>
                 ) : (
                   <>
                     {/* Start time */}
                     {timeRange.start && (
-                      <div className="text-base mb-1">
+                      <div className="text-base mb-1 font-bold" style={{ color: 'var(--text-primary)' }}>
                         {format(timeRange.start, 'h:mma').toLowerCase()}
                       </div>
                     )}
 
                     {/* Breaks */}
                     {dayStats.breaks.map((brk, i) => (
-                      <div key={i} className="text-base text-gray-600 mb-1">
+                      <div key={i} className="text-base mb-1 font-bold" style={{ color: 'var(--text-secondary)' }}>
                         break {format(brk.startTime, 'h:mma').toLowerCase()}-{format(brk.endTime, 'h:mma').toLowerCase()}
                       </div>
                     ))}
 
                     {/* End time */}
                     {timeRange.end && (
-                      <div className="text-base mb-3">
+                      <div className="text-base mb-3 font-bold" style={{ color: 'var(--text-primary)' }}>
                         {format(timeRange.end, 'h:mma').toLowerCase()}
                       </div>
                     )}
@@ -312,13 +333,16 @@ function WeekOverview() {
                             className="w-3 h-3 rounded-full flex-shrink-0"
                             style={{ backgroundColor: tag.color }}
                           />
-                          <span className="font-mono">{tag.hours}h {tag.minutes}m</span>
+                          <span className="font-mono" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
                         </div>
                       ))}
                     </div>
 
                     {/* Total */}
-                    <div className="text-xs border-t border-gray-200 pt-1">
+                    <div className="text-xs pt-1" style={{ 
+                      borderTop: `1px solid var(--border-color)`,
+                      color: 'var(--text-secondary)'
+                    }}>
                       Total: {dayTotal.hours}h {dayTotal.minutes}m
                     </div>
                   </>
