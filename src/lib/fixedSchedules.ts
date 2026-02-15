@@ -32,18 +32,32 @@ export async function ensureFixedTimeRecords(date: Date, tags: Tag[]): Promise<v
         const endTime = new Date(date);
         endTime.setHours(schedule.endHour, schedule.endMinute, 0, 0);
 
-        // Check if a record already exists for this time slot and tag
+        // Check if a similar record already exists
+        // Look for records with same tag and description (tag name) within 2 hours before/after
+        const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+        const scheduleStart = startTime.getTime();
+        const scheduleEnd = endTime.getTime();
+        
         const alreadyExists = existingRecords.some(record => {
+          // Must have the same tag
+          if (!record.tags.includes(tag.id)) {
+            return false;
+          }
+          
+          // Must have the same description (auto-generated records have description = tag name)
+          if (record.description !== tag.name) {
+            return false;
+          }
+          
           const recordStart = new Date(record.startTime).getTime();
           const recordEnd = new Date(record.endTime).getTime();
-          const scheduleStart = startTime.getTime();
-          const scheduleEnd = endTime.getTime();
-
-          return (
-            record.tags.includes(tag.id) &&
-            recordStart === scheduleStart &&
-            recordEnd === scheduleEnd
-          );
+          
+          // Check if record is within 2 hours before or after the scheduled time
+          const startTimeDiff = Math.abs(recordStart - scheduleStart);
+          const endTimeDiff = Math.abs(recordEnd - scheduleEnd);
+          
+          // If both start and end times are within 2 hours of the schedule, consider it the same
+          return startTimeDiff <= TWO_HOURS_MS && endTimeDiff <= TWO_HOURS_MS;
         });
 
         // Only create if doesn't exist
