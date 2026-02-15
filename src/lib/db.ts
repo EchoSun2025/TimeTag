@@ -9,10 +9,27 @@ export class TimeTagDatabase extends Dexie {
   constructor() {
     super('TimeTagDB');
     
+    // Version 1: Initial schema
     this.version(1).stores({
       records: 'id, startTime, endTime, *tags, createdAt',
       tags: 'id, name, createdAt',
       settings: '++id',
+    });
+
+    // Version 2: Add isLeisure and subItems to tags
+    this.version(2).stores({
+      records: 'id, startTime, endTime, *tags, createdAt',
+      tags: 'id, name, createdAt',
+      settings: '++id',
+    }).upgrade(async (trans) => {
+      // Migrate existing tags to add new fields
+      const tags = await trans.table('tags').toArray();
+      for (const tag of tags) {
+        await trans.table('tags').update(tag.id, {
+          isLeisure: tag.isLeisure ?? false,
+          subItems: tag.subItems ?? [],
+        });
+      }
     });
   }
 }

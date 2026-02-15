@@ -59,9 +59,9 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
 
   // Auto-fill first sub-item when tag is selected
   useEffect(() => {
-    if (!editRecord && selectedTags.length > 0 && tags) {
+    if (!editRecord && selectedTags.length > 0 && tags && tags.length > 0) {
       const tag = tags.find(t => t.id === selectedTags[0]);
-      if (tag && tag.subItems.length > 0) {
+      if (tag && tag.subItems && tag.subItems.length > 0) {
         setDescription(tag.subItems[0]);
         setCurrentSubItemIndex(0);
       } else {
