@@ -8,16 +8,16 @@ function MiniWindow() {
   const [elapsed, setElapsed] = useState(0);
   const tags = useLiveQuery(() => db.tags.toArray(), []);
 
-  // Debug logging
+  // Debug logging only once on mount
   useEffect(() => {
-    console.log('🎨 MiniWindow rendered:', {
+    console.log('🎨 MiniWindow mounted:', {
       hasActiveRecord: !!activeRecord,
-      elapsed,
       windowSize: { width: window.innerWidth, height: window.innerHeight },
       bodyBg: window.getComputedStyle(document.body).backgroundColor,
-      htmlBg: window.getComputedStyle(document.documentElement).backgroundColor
+      htmlBg: window.getComputedStyle(document.documentElement).backgroundColor,
+      rootDiv: document.getElementById('root')
     });
-  }, [activeRecord, elapsed]);
+  }, []); // Empty deps - only run once
 
   // Update elapsed time every second
   useEffect(() => {
@@ -49,8 +49,8 @@ function MiniWindow() {
         style={{ 
           WebkitAppRegion: 'drag',
           backgroundColor: '#1a1a24',
-          borderRadius: '16px',
-          border: '2px solid #2a4a70'
+          borderRadius: '12px',
+          border: '1px solid #2a4a70'
         } as any}
       >
         <div className="text-center text-sm opacity-70">
@@ -73,51 +73,51 @@ function MiniWindow() {
 
   return (
     <div 
-      className="w-full h-full flex items-center text-white shadow-2xl px-3 gap-2"
+      className="w-full h-full flex items-center text-white shadow-2xl px-2 gap-2"
       style={{ 
         WebkitAppRegion: 'drag', 
-        paddingTop: '7px', 
-        paddingBottom: '7px',
+        paddingTop: '4px', 
+        paddingBottom: '4px',
         backgroundColor: '#1a1a24',
-        borderRadius: '16px',
-        border: '2px solid #2a4a70'
+        borderRadius: '12px',
+        border: '1px solid #2a4a70'
       } as any}
     >
-      {/* Timer - 0.7x size, teal color */}
+      {/* Timer - smaller size, teal color */}
       <div 
         className="font-mono font-black tracking-wide leading-none flex-shrink-0"
-        style={{ fontSize: '1.3rem', color: '#2DD4BF' }}
+        style={{ fontSize: '1.1rem', color: '#2DD4BF' }}
       >
         {timeStr}
       </div>
 
       {/* Description + Tag - stacked vertically, tight to timer */}
-      <div className="flex flex-col justify-center min-w-0 gap-0.5">
+      <div className="flex flex-col justify-center min-w-0 gap-0">
         <div 
           className="font-medium truncate opacity-90 leading-tight"
-          style={{ fontSize: '0.82rem' }}
+          style={{ fontSize: '0.7rem' }}
           title={activeRecord.description}
         >
           {activeRecord.description || 'No description'}
         </div>
         <div 
           className="self-start px-1.5 py-0.5 rounded-full text-white leading-tight"
-          style={{ backgroundColor: tagColor, fontSize: '0.563rem' }}
+          style={{ backgroundColor: tagColor, fontSize: '0.5rem' }}
         >
           {tagName}
         </div>
       </div>
 
-      {/* Stop button - 0.75x size */}
+      {/* Stop button - smaller */}
       <button
         onClick={stopRecording}
         onMouseDown={(e) => e.stopPropagation()}
         className="flex-shrink-0 ml-auto bg-red-500 hover:bg-red-600 rounded flex items-center justify-center transition-colors shadow-lg"
-        style={{ WebkitAppRegion: 'no-drag', width: '21px', height: '21px' } as any}
+        style={{ WebkitAppRegion: 'no-drag', width: '18px', height: '18px' } as any}
         title="Stop recording (Alt+X)"
       >
-        <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor">
-          <rect width="8" height="8" rx="1" />
+        <svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor">
+          <rect width="7" height="7" rx="1" />
         </svg>
       </button>
     </div>
