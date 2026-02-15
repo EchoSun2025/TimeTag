@@ -18,6 +18,17 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const [editSubItems, setEditSubItems] = useState('');
   const [editSchedules, setEditSchedules] = useState<RecurringSchedule[]>([]);
 
+  // Auto-update selectedTag when tags change (after save)
+  React.useEffect(() => {
+    if (selectedTag && tags) {
+      const updatedTag = tags.find(t => t.id === selectedTag.id);
+      if (updatedTag && JSON.stringify(updatedTag) !== JSON.stringify(selectedTag)) {
+        // Tag has been updated in database, update the reference but keep edit states
+        setSelectedTag(updatedTag);
+      }
+    }
+  }, [tags, selectedTag]);
+
   const handleTagSelect = (tag: Tag) => {
     setSelectedTag(tag);
     setEditName(tag.name);
@@ -48,16 +59,9 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     }
 
     await db.tags.update(selectedTag.id, updateData);
-
-    // Reload the updated tag to keep it selected
-    const updatedTag = await db.tags.get(selectedTag.id);
-    if (updatedTag) {
-      setSelectedTag(updatedTag);
-      setEditName(updatedTag.name);
-      setEditIsLeisure(updatedTag.isLeisure ?? false);
-      setEditSubItems((updatedTag.subItems || []).join('\n'));
-      setEditSchedules(updatedTag.recurringSchedules || []);
-    }
+    
+    // Note: tags list will auto-update via useLiveQuery
+    // We keep selectedTag reference but don't manually reload to avoid losing focus
   };
 
   const handleCancel = () => {
