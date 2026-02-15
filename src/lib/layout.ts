@@ -2,9 +2,12 @@ import { TimeRecord } from '@/types';
 
 /**
  * Detect overlapping records and assign columns for side-by-side display
+ * Also treats records within 10 minutes of each other as "overlapping" for better visual separation
  */
 export function calculateOverlappingLayout(records: TimeRecord[]) {
   if (records.length === 0) return [];
+
+  const TEN_MINUTES_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
 
   // Sort by start time
   const sorted = [...records].sort((a, b) => 
@@ -24,14 +27,23 @@ export function calculateOverlappingLayout(records: TimeRecord[]) {
     const currentStart = new Date(current.startTime).getTime();
     const currentEnd = new Date(current.endTime).getTime();
 
-    // Find all overlapping records
+    // Find all overlapping or close-by records
     const overlapping = recordsWithLayout.filter((other, j) => {
       if (i === j) return false;
       const otherStart = new Date(other.startTime).getTime();
       const otherEnd = new Date(other.endTime).getTime();
       
-      // Check if they overlap
-      return !(otherEnd <= currentStart || otherStart >= currentEnd);
+      // Check if they actually overlap
+      const hasOverlap = !(otherEnd <= currentStart || otherStart >= currentEnd);
+      
+      // Check if they're within 10 minutes of each other
+      const gap = Math.min(
+        Math.abs(currentStart - otherEnd),  // Gap after other ends
+        Math.abs(otherStart - currentEnd)   // Gap after current ends
+      );
+      const isCloseBy = gap <= TEN_MINUTES_MS;
+      
+      return hasOverlap || isCloseBy;
     });
 
     // Find used columns by overlapping records
@@ -61,7 +73,15 @@ export function calculateOverlappingLayout(records: TimeRecord[]) {
       if (i === j) return false;
       const otherStart = new Date(other.startTime).getTime();
       const otherEnd = new Date(other.endTime).getTime();
-      return !(otherEnd <= currentStart || otherStart >= currentEnd);
+      
+      const hasOverlap = !(otherEnd <= currentStart || otherStart >= currentEnd);
+      const gap = Math.min(
+        Math.abs(currentStart - otherEnd),
+        Math.abs(otherStart - currentEnd)
+      );
+      const isCloseBy = gap <= TEN_MINUTES_MS;
+      
+      return hasOverlap || isCloseBy;
     });
 
     const maxTotalColumns = Math.max(
