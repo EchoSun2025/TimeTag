@@ -55,7 +55,11 @@ function ReminderSettings() {
       </div>
 
       {/* Enable reminders toggle */}
-      <div className="flex items-center gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+      <div className="flex items-center gap-4 p-4 rounded-lg" style={{
+        backgroundColor: 'var(--bg-secondary)',
+        borderWidth: '1px',
+        borderColor: 'var(--border-color)'
+      }}>
         <input
           type="checkbox"
           id="reminder-enabled"
@@ -64,8 +68,8 @@ function ReminderSettings() {
           className="w-5 h-5 cursor-pointer"
         />
         <label htmlFor="reminder-enabled" className="flex-1 cursor-pointer">
-          <div className="font-medium">Enable Voice Reminders</div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="font-medium" style={{ color: 'var(--text-primary)' }}>Enable Voice Reminders</div>
+          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             Use TTS to remind you to take breaks or return to work
           </div>
         </label>
@@ -258,14 +262,10 @@ function ReminderSettings() {
 
       {/* Info box */}
       <div className="rounded-lg p-4 text-sm" style={{
-        backgroundColor: document.documentElement.classList.contains('dark') 
-          ? 'rgba(234, 179, 8, 0.15)' 
-          : '#fef9c3',
+        backgroundColor: 'var(--bg-secondary)',
         borderWidth: '1px',
-        borderColor: document.documentElement.classList.contains('dark')
-          ? 'rgba(234, 179, 8, 0.3)'
-          : '#fde68a',
-        color: 'var(--text-primary)'
+        borderColor: 'var(--border-color)',
+        color: 'var(--text-secondary)'
       }}>
         <strong>How it works:</strong> Voice reminders will be announced using your system's TTS engine. 
         Reminders start automatically when you begin recording time. For leisure tags, the reminder frequency 
