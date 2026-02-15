@@ -432,8 +432,11 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       {/* Modal */}
       <div 
         ref={modalRef}
-        className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col"
-        style={{ color: 'var(--text-primary)' }}
+        className="relative rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col"
+        style={{ 
+          color: 'var(--text-primary)',
+          backgroundColor: 'var(--accent-bg)'
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border-color)' }}>

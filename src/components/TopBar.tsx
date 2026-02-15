@@ -69,8 +69,11 @@ function TopBar() {
 
   return (
     <div className={`px-6 py-3 flex items-center justify-between transition-colors ${
-      activeRecord ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-900'
-    }`} style={{ borderBottom: `1px solid var(--border-color)` }}>
+      activeRecord ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50'
+    }`} style={{ 
+      borderBottom: `1px solid var(--border-color)`,
+      backgroundColor: activeRecord ? undefined : 'var(--accent-bg)'
+    }}>
       {/* Left: Title */}
       <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>TimeTag</h1>
 

@@ -31,6 +31,8 @@
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     --accent-bg: #1e3a5f;  /* Deep blue instead of yellow */
     --accent-border: #2a4a70;
+    --timeline-bg: #2a4a6f;  /* Lighter blue for timeline */
+    --timeline-grid: #1a2a3f;  /* Darker for grid lines */
   }
 
   body {

@@ -284,12 +284,17 @@ function Timeline() {
   const dayStartTimestamp = dayStart.getTime();
 
   return (
-    <div className="h-full flex flex-col relative" style={{ backgroundColor: 'var(--accent-bg)' }}>
+    <div className="h-full flex flex-col relative" style={{ backgroundColor: 'var(--timeline-bg, var(--accent-bg))' }}>
       {/* Floating zoom controls */}
       <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         <button
           onClick={handleScrollToNow}
-          className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-all text-xl"
+          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md transition-all text-xl"
+          style={{ 
+            backgroundColor: 'var(--timeline-grid, #000)',
+            color: 'var(--text-primary)',
+            border: `1px solid var(--border-color)`
+          }}
           title="Scroll to current time"
         >
           ·
@@ -297,7 +302,12 @@ function Timeline() {
         <button
           onClick={handleZoomOut}
           disabled={timelineZoom <= 1}
-          className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          style={{ 
+            backgroundColor: 'var(--timeline-grid, #000)',
+            color: 'var(--text-primary)',
+            border: `1px solid var(--border-color)`
+          }}
           title="Zoom out"
         >
           -
@@ -305,7 +315,12 @@ function Timeline() {
         <button
           onClick={handleZoomIn}
           disabled={timelineZoom >= 5}
-          className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          style={{ 
+            backgroundColor: 'var(--timeline-grid, #000)',
+            color: 'var(--text-primary)',
+            border: `1px solid var(--border-color)`
+          }}
           title="Zoom in"
         >
           +
@@ -328,27 +343,42 @@ function Timeline() {
             return (
               <div
                 key={hour}
-                className="relative border-t border-gray-200"
-                style={{ height: `${heightPerHour}px` }}
+                className="relative"
+                style={{ 
+                  height: `${heightPerHour}px`,
+                  borderTop: `1px solid var(--timeline-grid, var(--border-color))`
+                }}
               >
                 {/* Hour label */}
-                <div className="absolute left-0 top-0 -mt-2 ml-2 text-xs text-gray-500">
+                <div className="absolute left-0 top-0 -mt-2 ml-2 text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
                   {displayHour}:{String(0).padStart(2, '0')}
                   {period}
                 </div>
 
                 {/* Grid lines for quarters */}
                 <div
-                  className="absolute left-12 right-0 border-t border-gray-100"
-                  style={{ top: `${heightPerHour * 0.25}px` }}
+                  className="absolute left-12 right-0"
+                  style={{ 
+                    top: `${heightPerHour * 0.25}px`,
+                    borderTop: `1px solid var(--timeline-grid, var(--border-color))`,
+                    opacity: 0.3
+                  }}
                 />
                 <div
-                  className="absolute left-12 right-0 border-t border-gray-100"
-                  style={{ top: `${heightPerHour * 0.5}px` }}
+                  className="absolute left-12 right-0"
+                  style={{ 
+                    top: `${heightPerHour * 0.5}px`,
+                    borderTop: `1px solid var(--timeline-grid, var(--border-color))`,
+                    opacity: 0.3
+                  }}
                 />
                 <div
-                  className="absolute left-12 right-0 border-t border-gray-100"
-                  style={{ top: `${heightPerHour * 0.75}px` }}
+                  className="absolute left-12 right-0"
+                  style={{ 
+                    top: `${heightPerHour * 0.75}px`,
+                    borderTop: `1px solid var(--timeline-grid, var(--border-color))`,
+                    opacity: 0.3
+                  }}
                 />
               </div>
             );
