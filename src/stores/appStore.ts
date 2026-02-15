@@ -90,10 +90,14 @@ export const useAppStore = create<AppState>()(
           updatedAt: new Date(),
         };
         
-        // Save to database
-        await db.records.add(record);
+        try {
+          // Use put instead of add to allow overwriting if exists
+          await db.records.put(record);
+        } catch (error) {
+          console.error('Failed to save record:', error);
+        }
         
-        // Reset recording state
+        // Reset recording state regardless of save success
         set({ activeRecord: null, isMiniMode: false });
         
         // Restore main window
@@ -121,31 +125,45 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'timetag-storage',
-      storage: createJSONStorage(() => localStorage),
+      storage: {
+        getItem: (name) => {
+          const str = localStorage.getItem(name);
+          if (!str) return null;
+          
+          try {
+            const parsed = JSON.parse(str);
+            // Convert startTime string back to Date
+            if (parsed.state?.activeRecord?.startTime) {
+              parsed.state.activeRecord.startTime = new Date(parsed.state.activeRecord.startTime);
+            }
+            return parsed;
+          } catch (e) {
+            return null;
+          }
+        },
+        setItem: (name, value) => {
+          // Convert Date to string before saving
+          const toSave = {
+            ...value,
+            state: {
+              ...value.state,
+              activeRecord: value.state.activeRecord ? {
+                ...value.state.activeRecord,
+                startTime: value.state.activeRecord.startTime instanceof Date 
+                  ? value.state.activeRecord.startTime.toISOString()
+                  : value.state.activeRecord.startTime,
+              } : null,
+            },
+          };
+          localStorage.setItem(name, JSON.stringify(toSave));
+        },
+        removeItem: (name) => localStorage.removeItem(name),
+      },
       partialize: (state) => ({
         // Only persist activeRecord and isMiniMode
         activeRecord: state.activeRecord,
         isMiniMode: state.isMiniMode,
       }),
-      // Custom serialization to handle Date objects
-      serialize: (state) => {
-        const serialized = {
-          ...state.state,
-          activeRecord: state.state.activeRecord ? {
-            ...state.state.activeRecord,
-            startTime: state.state.activeRecord.startTime.toISOString(),
-          } : null,
-        };
-        return JSON.stringify({ state: serialized, version: state.version });
-      },
-      // Custom deserialization to convert string back to Date
-      deserialize: (str) => {
-        const parsed = JSON.parse(str);
-        if (parsed.state.activeRecord && parsed.state.activeRecord.startTime) {
-          parsed.state.activeRecord.startTime = new Date(parsed.state.activeRecord.startTime);
-        }
-        return parsed;
-      },
     }
   )
 );
