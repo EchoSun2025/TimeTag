@@ -34,8 +34,23 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       setDescription('');
       setSelectedTags([]);
       setCurrentSubItemIndex(0);
+      setFocusedTagIndex(-1);
     }
   }, [editRecord, isOpen]);
+
+  // Auto-select first tag for new records
+  useEffect(() => {
+    if (!editRecord && isOpen && tags && tags.length > 0 && selectedTags.length === 0) {
+      // Auto-select first tag
+      setSelectedTags([tags[0].id]);
+      setFocusedTagIndex(0);
+      
+      // Focus on tags container after a short delay
+      setTimeout(() => {
+        tagsContainerRef.current?.focus();
+      }, 100);
+    }
+  }, [editRecord, isOpen, tags, selectedTags.length]);
 
   // Auto-fill first sub-item when tag is selected
   useEffect(() => {
@@ -44,6 +59,8 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       if (tag && tag.subItems.length > 0) {
         setDescription(tag.subItems[0]);
         setCurrentSubItemIndex(0);
+      } else {
+        setDescription('');
       }
     }
   }, [selectedTags, tags, editRecord]);
@@ -113,16 +130,26 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
     }
     
     // Arrow up/down: navigate between description and tags
-    if (e.key === 'ArrowDown' && document.activeElement === descriptionRef.current) {
-      e.preventDefault();
-      tagsContainerRef.current?.focus();
-      if (tags && tags.length > 0) {
-        setFocusedTagIndex(0);
+    if (e.key === 'ArrowDown') {
+      if (document.activeElement === descriptionRef.current) {
+        e.preventDefault();
+        tagsContainerRef.current?.focus();
+        if (focusedTagIndex === -1 && tags && tags.length > 0) {
+          setFocusedTagIndex(0);
+        }
       }
-    } else if (e.key === 'ArrowUp' && document.activeElement === tagsContainerRef.current) {
-      e.preventDefault();
-      descriptionRef.current?.focus();
-      setFocusedTagIndex(-1);
+    } else if (e.key === 'ArrowUp') {
+      if (document.activeElement === descriptionRef.current) {
+        e.preventDefault();
+        tagsContainerRef.current?.focus();
+        if (focusedTagIndex === -1 && tags && tags.length > 0) {
+          setFocusedTagIndex(0);
+        }
+      } else if (document.activeElement === tagsContainerRef.current) {
+        e.preventDefault();
+        descriptionRef.current?.focus();
+        setFocusedTagIndex(-1);
+      }
     }
     
     // Arrow left/right: navigate tags in tags container
@@ -133,7 +160,16 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         setFocusedTagIndex(prev => Math.max(prev - 1, 0));
-      } else if (e.key === 'Enter' || e.key === ' ') {
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (focusedTagIndex >= 0 && focusedTagIndex < tags.length) {
+          handleTagToggle(tags[focusedTagIndex].id);
+          // Move to description after selecting
+          setTimeout(() => {
+            descriptionRef.current?.focus();
+          }, 0);
+        }
+      } else if (e.key === ' ') {
         e.preventDefault();
         if (focusedTagIndex >= 0 && focusedTagIndex < tags.length) {
           handleTagToggle(tags[focusedTagIndex].id);
@@ -141,13 +177,7 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       }
     }
 
-    // Enter to save (from tags container only)
-    if (e.key === 'Enter' && document.activeElement === tagsContainerRef.current) {
-      e.preventDefault();
-      handleSave();
-    }
-
-    // Ctrl+Enter to save from description
+    // Ctrl+Enter to save from anywhere
     if (e.key === 'Enter' && e.ctrlKey) {
       e.preventDefault();
       handleSave();
@@ -240,7 +270,6 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What are you working on?"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              autoFocus
             />
           </div>
         </div>
