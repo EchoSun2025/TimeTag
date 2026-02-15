@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  /* Light mode (default) */}
+  /* Light mode (default) */
   :root {
     --bg-primary: #ffffff;
     --bg-secondary: #f9fafb;
@@ -16,6 +16,8 @@
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     --accent-bg: #fef3c7;  /* Light yellow for cards */
     --accent-border: #fde68a;
+    --timeline-bg: #fef9c3;  /* Light yellow for timeline */
+    --timeline-grid: #e5e7eb;  /* Light gray for grid lines */
   }
 
   /* Dark mode - based on TimeRecord v1 with deep blue accent */

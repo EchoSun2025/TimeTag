@@ -66,8 +66,6 @@ function WeekOverview() {
   const toggleWeekDays = () => {
     if (viewMode === '5days') {
       setViewMode('7days');
-    } else if (viewMode === '7days') {
-      setViewMode('month');
     } else {
       setViewMode('5days');
     }
@@ -160,7 +158,16 @@ function WeekOverview() {
               onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
               onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
-              {viewMode === 'month' ? '5 Days' : 'Month'}
+              {viewMode === '5days' ? '7 Days' : '5 Days'}
+            </button>
+            <button
+              onClick={() => setViewMode('month')}
+              className="px-6 py-2.5 text-base transition-colors"
+              style={{ color: 'var(--text-primary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              Month
             </button>
           </div>
         </div>
@@ -239,11 +246,23 @@ function WeekOverview() {
           <button
             onClick={toggleWeekDays}
             className="px-6 py-2.5 text-base transition-colors"
-            style={{ color: 'var(--text-primary)' }}
+            style={{
+              color: 'var(--text-primary)',
+              borderRight: `1px solid var(--accent-border)`
+            }}
             onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
             {viewMode === '5days' ? '7 Days' : '5 Days'}
+          </button>
+          <button
+            onClick={() => setViewMode('month')}
+            className="px-6 py-2.5 text-base transition-colors"
+            style={{ color: 'var(--text-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+          >
+            Month
           </button>
         </div>
 

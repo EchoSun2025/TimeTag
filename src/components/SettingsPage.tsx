@@ -432,7 +432,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       {/* Modal */}
       <div 
         ref={modalRef}
-        className="relative rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col"
+        className="relative rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col bg-white dark:bg-opacity-100"
         style={{ 
           color: 'var(--text-primary)',
           backgroundColor: 'var(--accent-bg)'

@@ -253,15 +253,17 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4" onKeyDown={handleKeyDown}>
+      <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl mx-4" 
+        style={{ color: 'var(--text-primary)' }}
+        onKeyDown={handleKeyDown}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
           <h2 className="text-xl font-semibold">
             {editRecord ? 'Edit Record' : 'New Record'}
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
           >
             ×
           </button>
@@ -271,7 +273,7 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
         <div className="px-6 py-4 space-y-4">
           {/* Tags - Top Priority */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
               Tag
             </label>
             <div 
@@ -293,7 +295,7 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                     selectedTags.includes(tag.id)
                       ? 'text-white ring-2 ring-offset-2'
-                      : 'bg-gray-200 text-gray-600'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                   } ${
                     focusedTagIndex === index ? 'ring-2 ring-blue-500' : ''
                   }`}
@@ -307,17 +309,17 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
                 </button>
               ))}
             </div>
-            <div className="text-xs text-gray-400 mt-2">
+            <div className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
               Use ↑ ↓ ← → to navigate tags, Space to select, Enter to start recording
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
               Description
               {subItems.length > 0 && (
-                <span className="text-xs text-gray-400 ml-2">
+                <span className="text-xs ml-2" style={{ color: 'var(--text-muted)' }}>
                   (Use ← → to cycle through {subItems.length} saved items)
                 </span>
               )}
@@ -328,18 +330,22 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What are you working on?"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+              style={{ 
+                borderColor: 'var(--border-color)',
+                color: 'var(--text-primary)'
+              }}
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+        <div className="flex items-center justify-between px-6 py-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
           {/* Delete button on left (only when editing) */}
           {editRecord && (
             <button
               onClick={handleDelete}
-              className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              className="px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
             >
               Delete
             </button>
@@ -349,7 +355,8 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
           <div className={`flex items-center gap-3 ${!editRecord ? 'ml-auto' : ''}`}>
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+              className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+              style={{ color: 'var(--text-primary)' }}
             >
               Cancel
             </button>
@@ -359,7 +366,7 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
             >
               {editRecord ? 'Update' : 'Start Recording'}
             </button>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
               Enter
             </div>
           </div>

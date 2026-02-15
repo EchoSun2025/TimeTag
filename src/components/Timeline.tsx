@@ -289,9 +289,8 @@ function Timeline() {
       <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         <button
           onClick={handleScrollToNow}
-          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md transition-all text-xl"
+          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md transition-all text-xl bg-white dark:bg-black"
           style={{ 
-            backgroundColor: 'var(--timeline-grid, #000)',
             color: 'var(--text-primary)',
             border: `1px solid var(--border-color)`
           }}
@@ -302,9 +301,8 @@ function Timeline() {
         <button
           onClick={handleZoomOut}
           disabled={timelineZoom <= 1}
-          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-all bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-800"
           style={{ 
-            backgroundColor: 'var(--timeline-grid, #000)',
             color: 'var(--text-primary)',
             border: `1px solid var(--border-color)`
           }}
@@ -315,9 +313,8 @@ function Timeline() {
         <button
           onClick={handleZoomIn}
           disabled={timelineZoom >= 5}
-          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="w-10 h-10 flex items-center justify-center rounded-full shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-all bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-800"
           style={{ 
-            backgroundColor: 'var(--timeline-grid, #000)',
             color: 'var(--text-primary)',
             border: `1px solid var(--border-color)`
           }}
