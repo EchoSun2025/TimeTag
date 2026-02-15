@@ -57,40 +57,40 @@ function MiniWindow() {
 
   return (
     <div 
-      className="w-full h-full flex items-center bg-gray-900/95 text-white rounded-lg shadow-2xl backdrop-blur-sm px-4"
+      className="w-full h-full flex items-center bg-gray-900/95 text-white rounded-lg shadow-2xl backdrop-blur-sm px-4 gap-3"
       style={{ WebkitAppRegion: 'drag' } as any}
     >
-      {/* Timer - bold and bright */}
+      {/* Timer - 0.7x size, teal color */}
       <div 
-        className="text-3xl font-mono font-black tracking-wide leading-none"
-        style={{ color: tagColor }}
+        className="font-mono font-black tracking-wide leading-none flex-shrink-0"
+        style={{ fontSize: '1.3rem', color: '#2DD4BF' }}
       >
         {timeStr}
       </div>
 
-      {/* Description + Tag - to the right of timer */}
-      <div className="flex-1 flex items-center gap-2 ml-4 min-w-0">
-        <div className="text-sm font-medium truncate opacity-90" title={activeRecord.description}>
+      {/* Description + Tag - stacked vertically, to the right of timer */}
+      <div className="flex-1 flex flex-col justify-center min-w-0 gap-0.5">
+        <div className="text-sm font-medium truncate opacity-90 leading-tight" title={activeRecord.description}>
           {activeRecord.description || 'No description'}
         </div>
         <div 
-          className="flex-shrink-0 text-xs px-2 py-0.5 rounded text-white"
+          className="self-start text-xs px-2 py-0.5 rounded text-white leading-tight"
           style={{ backgroundColor: tagColor }}
         >
           {tagName}
         </div>
       </div>
 
-      {/* Stop button - smaller */}
+      {/* Stop button - 0.75x size */}
       <button
         onClick={stopRecording}
         onMouseDown={(e) => e.stopPropagation()}
-        className="flex-shrink-0 ml-3 w-7 h-7 bg-red-500 hover:bg-red-600 rounded flex items-center justify-center transition-colors shadow-lg"
-        style={{ WebkitAppRegion: 'no-drag' } as any}
+        className="flex-shrink-0 bg-red-500 hover:bg-red-600 rounded flex items-center justify-center transition-colors shadow-lg"
+        style={{ WebkitAppRegion: 'no-drag', width: '21px', height: '21px' } as any}
         title="Stop recording (Alt+X)"
       >
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-          <rect width="10" height="10" rx="1" />
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor">
+          <rect width="8" height="8" rx="1" />
         </svg>
       </button>
     </div>

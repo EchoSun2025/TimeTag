@@ -7,14 +7,17 @@ import TimeBlock from './TimeBlock';
 import { TimeRecord } from '@/types';
 import { calculateOverlappingLayout } from '@/lib/layout';
 import { ensureFixedTimeRecords } from '@/lib/fixedSchedules';
+import { isSameDay } from 'date-fns';
+import { formatTime } from '@/lib/utils';
 
 function Timeline() {
-  const { timelineZoom, setTimelineZoom, currentDate } = useAppStore();
+  const { timelineZoom, setTimelineZoom, currentDate, activeRecord } = useAppStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStartTime, setModalStartTime] = useState<Date | undefined>();
   const [modalEndTime, setModalEndTime] = useState<Date | undefined>();
   const [editingRecord, setEditingRecord] = useState<TimeRecord | undefined>();
+  const [activeBlockNow, setActiveBlockNow] = useState<Date>(new Date());
 
   // Fetch records for current date
   const records = useLiveQuery(async () => {
@@ -40,6 +43,29 @@ function Timeline() {
       ensureFixedTimeRecords(dateObj, tags);
     }
   }, [currentDate, tags]);
+
+  // Refresh active record placeholder every 15 minutes
+  useEffect(() => {
+    if (!activeRecord) return;
+
+    // Set initial "now"
+    setActiveBlockNow(new Date());
+
+    // Refresh every 15 minutes (900,000ms)
+    const interval = setInterval(() => {
+      setActiveBlockNow(new Date());
+    }, 15 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [activeRecord]);
+
+  // Check if active record is on the currently viewed day
+  const activeRecordOnCurrentDay = useMemo(() => {
+    if (!activeRecord) return false;
+    const dateObj = currentDate instanceof Date ? currentDate : new Date(currentDate);
+    const startTime = activeRecord.startTime instanceof Date ? activeRecord.startTime : new Date(activeRecord.startTime);
+    return isSameDay(startTime, dateObj);
+  }, [activeRecord, currentDate]);
 
   // Calculate overlapping layout
   const recordsWithLayout = useMemo(() => {
@@ -297,6 +323,64 @@ function Timeline() {
                 totalColumns={record.totalColumns}
               />
             ))}
+
+            {/* Active record placeholder */}
+            {activeRecordOnCurrentDay && activeRecord && tags && (() => {
+              const startTime = activeRecord.startTime instanceof Date ? activeRecord.startTime : new Date(activeRecord.startTime);
+              const startMs = startTime.getTime();
+              const nowMs = activeBlockNow.getTime();
+
+              // Calculate position
+              const startMinutes = (startMs - dayStartTimestamp) / (1000 * 60);
+              const durationMinutes = Math.max((nowMs - startMs) / (1000 * 60), 15); // At least 15min display
+              const placeholderTop = (startMinutes / 60) * heightPerHour;
+              const placeholderHeight = Math.max((durationMinutes / 60) * heightPerHour, 20);
+
+              // Get tag info
+              const tag = tags.find(t => t.id === activeRecord.tags[0]);
+              const tagColor = tag?.color || '#4285F4';
+              const tagName = tag?.name || 'No Tag';
+
+              return (
+                <div
+                  className="absolute px-1"
+                  style={{
+                    top: `${placeholderTop}px`,
+                    height: `${placeholderHeight}px`,
+                    left: '0%',
+                    width: '100%',
+                    zIndex: 5,
+                  }}
+                >
+                  <div
+                    className="h-full rounded border-l-4 px-2 py-1 overflow-hidden animate-pulse"
+                    style={{
+                      backgroundColor: tagColor + '20',
+                      borderColor: tagColor,
+                      borderStyle: 'dashed',
+                      borderLeftStyle: 'solid',
+                    }}
+                  >
+                    <div className="text-xs font-medium opacity-60">
+                      {formatTime(startTime)} - recording...
+                    </div>
+                    {placeholderHeight > 40 && (
+                      <div className="text-sm font-medium mt-1 opacity-70">
+                        {activeRecord.description || 'No description'}
+                      </div>
+                    )}
+                    {placeholderHeight > 60 && tag && (
+                      <span
+                        className="inline-block text-xs px-1.5 py-0.5 rounded text-white mt-1 opacity-70"
+                        style={{ backgroundColor: tagColor }}
+                      >
+                        {tagName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
