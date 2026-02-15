@@ -140,7 +140,10 @@ function ReminderSettings() {
         )}
 
         {normalMessageMode === 'random' && (
-          <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-3 rounded">
+          <div className="text-sm p-3 rounded" style={{
+            backgroundColor: 'var(--bg-secondary)',
+            color: 'var(--text-secondary)'
+          }}>
             <strong>Random messages include:</strong> "Time for a break! Stretch and hydrate", 
             "Rest your eyes and move around", "Take a breather, you've been working hard", etc.
           </div>
@@ -216,7 +219,10 @@ function ReminderSettings() {
         )}
 
         {leisureMessageMode === 'random' && (
-          <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-3 rounded">
+          <div className="text-sm p-3 rounded" style={{
+            backgroundColor: 'var(--bg-secondary)',
+            color: 'var(--text-secondary)'
+          }}>
             <strong>Random messages include:</strong> "Time to get back to work!", 
             "Break's over, let's be productive", "Ready to tackle some tasks?", etc.
             The tone gradually intensifies with each reminder.
@@ -225,7 +231,16 @@ function ReminderSettings() {
       </div>
 
       {/* Info box */}
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-sm">
+      <div className="rounded-lg p-4 text-sm" style={{
+        backgroundColor: document.documentElement.classList.contains('dark') 
+          ? 'rgba(234, 179, 8, 0.15)' 
+          : '#fef9c3',
+        borderWidth: '1px',
+        borderColor: document.documentElement.classList.contains('dark')
+          ? 'rgba(234, 179, 8, 0.3)'
+          : '#fde68a',
+        color: 'var(--text-primary)'
+      }}>
         <strong>How it works:</strong> Voice reminders will be announced using your system's TTS engine. 
         Reminders start automatically when you begin recording time. For leisure tags, the reminder frequency 
         increases to encourage you to return to productive activities.

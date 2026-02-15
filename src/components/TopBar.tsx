@@ -82,7 +82,7 @@ function TopBar() {
         <div className="flex-1 mx-8 flex items-center justify-center">
           <div className="flex items-center gap-3">
             {/* Description */}
-            <span className="text-base font-medium text-gray-800">
+            <span className="text-base font-medium" style={{ color: 'var(--text-primary)' }}>
               {displayRecord.description || 'No description'}
             </span>
 

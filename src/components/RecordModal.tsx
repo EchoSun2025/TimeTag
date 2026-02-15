@@ -253,8 +253,11 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl mx-4" 
-        style={{ color: 'var(--text-primary)' }}
+      <div className="relative rounded-lg shadow-xl w-full max-w-2xl mx-4" 
+        style={{ 
+          backgroundColor: 'var(--bg-primary)',
+          color: 'var(--text-primary)' 
+        }}
         onKeyDown={handleKeyDown}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
@@ -295,12 +298,14 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                     selectedTags.includes(tag.id)
                       ? 'text-white ring-2 ring-offset-2'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                      : 'text-gray-600 dark:text-gray-300'
                   } ${
                     focusedTagIndex === index ? 'ring-2 ring-blue-500' : ''
                   }`}
                   style={{
-                    backgroundColor: selectedTags.includes(tag.id) ? tag.color : undefined,
+                    backgroundColor: selectedTags.includes(tag.id) 
+                      ? tag.color 
+                      : (document.documentElement.classList.contains('dark') ? 'var(--bg-tertiary)' : '#e5e7eb'),
                     borderColor: selectedTags.includes(tag.id) ? tag.color : undefined,
                   }}
                   tabIndex={-1}
@@ -330,9 +335,10 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What are you working on?"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               style={{ 
                 borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-secondary)',
                 color: 'var(--text-primary)'
               }}
             />
@@ -355,8 +361,13 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
           <div className={`flex items-center gap-3 ${!editRecord ? 'ml-auto' : ''}`}>
             <button
               onClick={handleClose}
-              className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-              style={{ color: 'var(--text-primary)' }}
+              className="px-4 py-2 rounded-md transition-colors"
+              style={{ 
+                color: 'var(--text-primary)',
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
               Cancel
             </button>

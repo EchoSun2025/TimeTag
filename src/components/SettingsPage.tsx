@@ -268,7 +268,13 @@ const TagEditor = React.memo(({
         </button>
         <button
           onClick={handleCancel}
-          className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          className="px-4 py-2 rounded-md transition-colors"
+          style={{ 
+            color: 'var(--text-primary)',
+            backgroundColor: 'transparent'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
           Cancel
         </button>
@@ -497,9 +503,24 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                       onClick={() => handleTagSelect(tag)}
                       className={`w-full text-left px-3 py-2 rounded transition-all ${
                         selectedTag?.id === tag.id
-                          ? 'bg-blue-50 dark:bg-blue-900/50 border-2 border-blue-500'
-                          : 'bg-gray-50 dark:bg-gray-800 border-2 border-transparent hover:bg-gray-100 dark:hover:bg-gray-700'
+                          ? 'border-2 border-blue-500'
+                          : 'border-2 border-transparent'
                       }`}
+                      style={{
+                        backgroundColor: selectedTag?.id === tag.id 
+                          ? (document.documentElement.classList.contains('dark') ? 'rgba(59, 130, 246, 0.2)' : '#eff6ff')
+                          : 'var(--bg-secondary)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedTag?.id !== tag.id) {
+                          e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedTag?.id !== tag.id) {
+                          e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                        }
+                      }}
                     >
                       <div className="flex items-center gap-2">
                         <div 
@@ -508,7 +529,14 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                         />
                         <span className="font-medium">{tag.name}</span>
                         {tag.isLeisure && (
-                          <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-1.5 py-0.5 rounded">
+                          <span className="text-xs px-1.5 py-0.5 rounded" style={{
+                            backgroundColor: document.documentElement.classList.contains('dark') 
+                              ? 'rgba(234, 179, 8, 0.2)' 
+                              : '#fef9c3',
+                            color: document.documentElement.classList.contains('dark')
+                              ? '#fde047'
+                              : '#a16207'
+                          }}>
                             Leisure
                           </span>
                         )}

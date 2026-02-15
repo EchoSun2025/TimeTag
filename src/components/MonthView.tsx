@@ -167,18 +167,24 @@ function MonthView({ currentDate }: MonthViewProps) {
               <div
                 key={index}
                 className={`
-                  border rounded p-2 min-h-20
-                  ${dayStat.isCurrentMonth ? 'border-gray-200' : 'border-gray-100 opacity-40'}
+                  rounded p-2 min-h-20
                   ${dayStat.minutes > 0 ? 'cursor-pointer hover:ring-2 hover:ring-blue-300' : ''}
+                  ${dayStat.isCurrentMonth ? '' : 'opacity-40'}
                 `}
-                style={{ backgroundColor: bgColor }}
+                style={{ 
+                  backgroundColor: bgColor,
+                  borderWidth: '1px',
+                  borderColor: dayStat.isCurrentMonth ? 'var(--border-color)' : 'var(--bg-tertiary)'
+                }}
                 title={`${format(dayStat.date, 'MMM dd')}: ${dayTime.hours}h ${dayTime.minutes}m`}
               >
-                <div className={`text-lg font-semibold mb-1 ${dayStat.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className="text-lg font-semibold mb-1" style={{ 
+                  color: dayStat.isCurrentMonth ? 'var(--text-primary)' : 'var(--text-muted)' 
+                }}>
                   {format(dayStat.date, 'd')}
                 </div>
                 {dayStat.minutes > 0 && (
-                  <div className="text-xs font-mono text-gray-700">
+                  <div className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>
                     {dayTime.hours}h {dayTime.minutes}m
                   </div>
                 )}
