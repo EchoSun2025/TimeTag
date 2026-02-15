@@ -47,6 +47,25 @@ const TagEditor = React.memo(({
   // Auto-focus on name input when editor opens
   const nameInputRef = React.useRef<HTMLInputElement>(null);
   
+  React.useEffect(() => {
+    // Force focus with a slight delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      if (nameInputRef.current) {
+        // First, focus the window to bring focus back to the page
+        window.focus();
+        // Then focus the input
+        nameInputRef.current.focus();
+        // Force selection to make cursor visible
+        nameInputRef.current.select();
+        // Move cursor to end
+        const len = nameInputRef.current.value.length;
+        nameInputRef.current.setSelectionRange(len, len);
+      }
+    }, 50);
+    
+    return () => clearTimeout(timeoutId);
+  }, [selectedTagId]);
+  
   return (
     <div className="space-y-6">
       {/* Tag Name */}
@@ -60,7 +79,6 @@ const TagEditor = React.memo(({
           type="text"
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
-          autoFocus
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
