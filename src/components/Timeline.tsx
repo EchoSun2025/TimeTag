@@ -35,7 +35,9 @@ function Timeline() {
   // Ensure fixed time records exist for current date
   useEffect(() => {
     if (tags && tags.length > 0) {
-      ensureFixedTimeRecords(currentDate, tags);
+      // Ensure currentDate is a Date object (in case it was deserialized from storage)
+      const dateObj = currentDate instanceof Date ? currentDate : new Date(currentDate);
+      ensureFixedTimeRecords(dateObj, tags);
     }
   }, [currentDate, tags]);
 

@@ -120,9 +120,32 @@ export const useAppStore = create<AppState>()(
       },
     }),
     {
-      name: 'timetag-storage', // localStorage key
+      name: 'timetag-storage',
       storage: createJSONStorage(() => localStorage),
-      partialPersist: true,
+      partialize: (state) => ({
+        // Only persist activeRecord and isMiniMode
+        activeRecord: state.activeRecord,
+        isMiniMode: state.isMiniMode,
+      }),
+      // Custom serialization to handle Date objects
+      serialize: (state) => {
+        const serialized = {
+          ...state.state,
+          activeRecord: state.state.activeRecord ? {
+            ...state.state.activeRecord,
+            startTime: state.state.activeRecord.startTime.toISOString(),
+          } : null,
+        };
+        return JSON.stringify({ state: serialized, version: state.version });
+      },
+      // Custom deserialization to convert string back to Date
+      deserialize: (str) => {
+        const parsed = JSON.parse(str);
+        if (parsed.state.activeRecord && parsed.state.activeRecord.startTime) {
+          parsed.state.activeRecord.startTime = new Date(parsed.state.activeRecord.startTime);
+        }
+        return parsed;
+      },
     }
   )
 );
