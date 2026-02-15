@@ -30,3 +30,6 @@ release
 
 # OS
 Thumbs.db
+
+# Documentation
+FEATURE_REQUIREMENTS.md
