@@ -5,10 +5,15 @@ import { db } from '@/lib/db';
 import { formatWeekRange, getWeekDays } from '@/lib/utils';
 import { calculateDayStats, getDayTimeRange, formatMinutesToHM } from '@/lib/stats';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
+import MonthView from './MonthView';
+
+type ViewMode = '5days' | 'week' | 'month';
 
 function WeekOverview() {
   const { currentDate, showWeekExpanded, setShowWeekExpanded } = useAppStore();
-  const [weekDaysCount, setWeekDaysCount] = useState<5 | 7>(5);
+  const [viewMode, setViewMode] = useState<ViewMode>('5days');
+  
+  const weekDaysCount = viewMode === '5days' ? 5 : 7;
 
   const weekDays = getWeekDays(currentDate, weekDaysCount);
 
@@ -59,18 +64,36 @@ function WeekOverview() {
   }, [weekRecords, tags, weekDays]);
 
   const toggleWeekDays = () => {
-    setWeekDaysCount(weekDaysCount === 5 ? 7 : 5);
+    if (viewMode === '5days') {
+      setViewMode('week');
+    } else if (viewMode === 'week') {
+      setViewMode('month');
+    } else {
+      setViewMode('5days');
+    }
   };
 
-  const handlePrevWeek = () => {
+  const jumpToThisWeek = () => {
+    useAppStore.getState().setCurrentDate(new Date());
+  };
+
+  const handlePrevPeriod = () => {
     const prev = new Date(currentDate);
-    prev.setDate(prev.getDate() - 7);
+    if (viewMode === 'month') {
+      prev.setMonth(prev.getMonth() - 1);
+    } else {
+      prev.setDate(prev.getDate() - 7);
+    }
     useAppStore.getState().setCurrentDate(prev);
   };
 
-  const handleNextWeek = () => {
+  const handleNextPeriod = () => {
     const next = new Date(currentDate);
-    next.setDate(next.getDate() + 7);
+    if (viewMode === 'month') {
+      next.setMonth(next.getMonth() + 1);
+    } else {
+      next.setDate(next.getDate() + 7);
+    }
     useAppStore.getState().setCurrentDate(next);
   };
 
@@ -78,6 +101,62 @@ function WeekOverview() {
     return <div className="flex items-center justify-center h-full">Loading...</div>;
   }
 
+  // If month view, render MonthView component
+  if (viewMode === 'month') {
+    return (
+      <div className="flex flex-col h-full">
+        {/* Month navigation */}
+        <div className="flex items-center gap-4 mb-6">
+          {/* Month date navigation */}
+          <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
+            <button
+              onClick={handlePrevPeriod}
+              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
+            >
+              &lt;
+            </button>
+            
+            <div className="text-xl font-sans font-bold">
+              {format(currentDate, 'yyyy MMM')}
+            </div>
+            
+            <button
+              onClick={handleNextPeriod}
+              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
+            >
+              &gt;
+            </button>
+          </div>
+
+          {/* View mode buttons */}
+          <div className="flex bg-yellow-50/50 border border-yellow-200 rounded-full overflow-hidden">
+            <button
+              onClick={jumpToThisWeek}
+              className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-r border-yellow-200"
+            >
+              This Week
+            </button>
+            <button
+              onClick={() => setViewMode('5days')}
+              className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-r border-yellow-200"
+            >
+              5 Days
+            </button>
+            <button
+              onClick={() => setViewMode('month')}
+              className="px-6 py-2.5 text-base bg-yellow-200 font-semibold"
+            >
+              Month
+            </button>
+          </div>
+        </div>
+
+        <MonthView currentDate={currentDate} />
+      </div>
+    );
+  }
+
+  // Week view rendering
   const weekTotalTime = formatMinutesToHM(weekStats.totalMinutes);
   
   // Get week tag breakdown
@@ -103,39 +182,63 @@ function WeekOverview() {
         {/* Week date navigation with background card */}
         <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
           <button
-            onClick={handlePrevWeek}
+            onClick={handlePrevPeriod}
             className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
           >
             &lt;
           </button>
           
-          <div className="text-xl font-sans">
+          <div className="text-xl font-sans font-bold">
             {formatWeekRange(currentDate)}
           </div>
           
           <button
-            onClick={handleNextWeek}
+            onClick={handleNextPeriod}
             className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
           >
             &gt;
           </button>
         </div>
 
-        {/* Combined 5/7 Days and Expand button - outside with lighter yellow background */}
-        <div className="flex bg-yellow-50/50 border border-yellow-200 rounded-full overflow-hidden divide-x divide-yellow-200">
+        {/* View mode buttons */}
+        <div className="flex bg-yellow-50/50 border border-yellow-200 rounded-full overflow-hidden">
           <button
-            onClick={toggleWeekDays}
-            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors"
+            onClick={jumpToThisWeek}
+            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-r border-yellow-200"
           >
-            {weekDaysCount} Days
+            This Week
           </button>
           <button
-            onClick={() => setShowWeekExpanded(!showWeekExpanded)}
-            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors"
+            onClick={() => setViewMode('5days')}
+            className={`px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-r border-yellow-200 ${
+              viewMode === '5days' ? 'bg-yellow-200 font-semibold' : ''
+            }`}
           >
-            {showWeekExpanded ? 'Mini Timeline' : 'Expand'}
+            5 Days
+          </button>
+          <button
+            onClick={() => setViewMode('week')}
+            className={`px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors ${
+              viewMode === 'week' ? 'bg-yellow-200 font-semibold' : ''
+            }`}
+          >
+            7 Days
+          </button>
+          <button
+            onClick={() => setViewMode('month')}
+            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-l border-yellow-200"
+          >
+            Month
           </button>
         </div>
+
+        {/* Expand button */}
+        <button
+          onClick={() => setShowWeekExpanded(!showWeekExpanded)}
+          className="px-6 py-2.5 text-base bg-yellow-50/50 border border-yellow-200 rounded-full hover:bg-yellow-100 transition-colors"
+        >
+          {showWeekExpanded ? 'Mini Timeline' : 'Expand'}
+        </button>
 
         {/* Week total card with tag breakdown */}
         <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">
