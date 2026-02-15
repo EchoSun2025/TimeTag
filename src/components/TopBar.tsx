@@ -42,7 +42,7 @@ function TopBar() {
     setIsRounding(newState);
 
     if (newState) {
-      // Apply rounding to all records
+      // Turning ON: Apply rounding and save original times
       const allRecords = await db.records.toArray();
       
       for (const record of allRecords) {
@@ -52,8 +52,25 @@ function TopBar() {
         await db.records.update(record.id, {
           startTime: roundedStart,
           endTime: roundedEnd,
+          // Save original times if not already saved
+          originalStartTime: record.originalStartTime || record.startTime,
+          originalEndTime: record.originalEndTime || record.endTime,
           updatedAt: new Date(),
         });
+      }
+    } else {
+      // Turning OFF: Restore original times
+      const allRecords = await db.records.toArray();
+      
+      for (const record of allRecords) {
+        // Restore from original times if available
+        if (record.originalStartTime && record.originalEndTime) {
+          await db.records.update(record.id, {
+            startTime: record.originalStartTime,
+            endTime: record.originalEndTime,
+            updatedAt: new Date(),
+          });
+        }
       }
     }
 

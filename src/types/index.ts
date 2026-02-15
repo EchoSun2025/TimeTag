@@ -8,6 +8,9 @@ export interface TimeRecord {
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
+  // Store original times for 15min rounding toggle
+  originalStartTime?: Date;
+  originalEndTime?: Date;
 }
 
 export interface ActiveRecord {

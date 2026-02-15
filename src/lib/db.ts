@@ -73,6 +73,22 @@ export class TimeTagDatabase extends Dexie {
         });
       }
     });
+
+    // Version 5: Add original time fields for 15min rounding toggle
+    this.version(5).stores({
+      records: 'id, startTime, endTime, *tags, createdAt',
+      tags: 'id, name, createdAt',
+      settings: '++id',
+    }).upgrade(async (trans) => {
+      const records = await trans.table('records').toArray();
+      for (const record of records) {
+        // Initialize original times as null (will be set when rounding is enabled)
+        await trans.table('records').update(record.id, {
+          originalStartTime: record.originalStartTime ?? null,
+          originalEndTime: record.originalEndTime ?? null,
+        });
+      }
+    });
   }
 }
 
