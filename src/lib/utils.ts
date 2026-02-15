@@ -9,6 +9,22 @@ export function roundTime(date: Date, intervalMinutes: number = 15): Date {
 }
 
 /**
+ * Round start time DOWN to interval (ensures no time is lost)
+ */
+export function roundTimeDown(date: Date, intervalMinutes: number = 15): Date {
+  const ms = 1000 * 60 * intervalMinutes;
+  return new Date(Math.floor(date.getTime() / ms) * ms);
+}
+
+/**
+ * Round end time UP to interval (ensures no time is lost)
+ */
+export function roundTimeUp(date: Date, intervalMinutes: number = 15): Date {
+  const ms = 1000 * 60 * intervalMinutes;
+  return new Date(Math.ceil(date.getTime() / ms) * ms);
+}
+
+/**
  * Format time for display (e.g., "9:15am")
  */
 export function formatTime(date: Date): string {

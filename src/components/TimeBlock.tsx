@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { TimeRecord, Tag } from '@/types';
-import { formatTime, roundTime } from '@/lib/utils';
+import { formatTime, roundTimeDown, roundTimeUp } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { useAppStore } from '@/stores/appStore';
 
@@ -104,13 +104,13 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
       newStartTime = Math.max(dayStart, Math.min(newStartTime, dayEnd));
       newEndTime = Math.max(dayStart, Math.min(newEndTime, dayEnd));
 
-      // Apply 15-minute rounding if enabled
+      // Apply 15-minute rounding if enabled (start DOWN, end UP to preserve duration)
       let finalStartTime = new Date(newStartTime);
       let finalEndTime = new Date(newEndTime);
       
       if (settings?.timeRounding) {
-        finalStartTime = roundTime(finalStartTime, 15);
-        finalEndTime = roundTime(finalEndTime, 15);
+        finalStartTime = roundTimeDown(finalStartTime, 15);
+        finalEndTime = roundTimeUp(finalEndTime, 15);
       }
 
       // Update database

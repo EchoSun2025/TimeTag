@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { roundTime } from '@/lib/utils';
+import { roundTimeDown, roundTimeUp } from '@/lib/utils';
 import { useAppStore } from '@/stores/appStore';
 import SettingsPage from './SettingsPage';
 
@@ -49,8 +49,9 @@ function TopBar() {
       for (const record of allRecords) {
         const currentStart = new Date(record.startTime);
         const currentEnd = new Date(record.endTime);
-        const roundedStart = roundTime(currentStart, 15);
-        const roundedEnd = roundTime(currentEnd, 15);
+        // Round start DOWN and end UP to ensure no time is lost
+        const roundedStart = roundTimeDown(currentStart, 15);
+        const roundedEnd = roundTimeUp(currentEnd, 15);
         
         // Only save original times if not already saved
         const updates: any = {
