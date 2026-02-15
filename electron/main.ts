@@ -37,8 +37,8 @@ function createMainWindow() {
 
 function createMiniWindow() {
   miniWindow = new BrowserWindow({
-    width: 360,
-    height: 84,
+    width: 252,
+    height: 109,
     x: 20,  // Position at left
     y: 20,  // Position at top
     frame: false,

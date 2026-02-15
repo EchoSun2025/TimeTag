@@ -72,7 +72,7 @@ function MiniWindow() {
       <div className="flex flex-col justify-center min-w-0 gap-0.5">
         <div 
           className="font-medium truncate opacity-90 leading-tight"
-          style={{ fontSize: '0.656rem' }}
+          style={{ fontSize: '0.82rem' }}
           title={activeRecord.description}
         >
           {activeRecord.description || 'No description'}
