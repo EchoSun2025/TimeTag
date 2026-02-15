@@ -29,7 +29,8 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
     if (editRecord) {
       setDescription(editRecord.description);
       setSelectedTags(editRecord.tags);
-    } else {
+      setFocusedTagIndex(-1);
+    } else if (isOpen) {
       // Reset for new record
       setDescription('');
       setSelectedTags([]);
@@ -40,17 +41,21 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
 
   // Auto-select first tag for new records
   useEffect(() => {
-    if (!editRecord && isOpen && tags && tags.length > 0 && selectedTags.length === 0) {
-      // Auto-select first tag
-      setSelectedTags([tags[0].id]);
-      setFocusedTagIndex(0);
-      
-      // Focus on tags container after a short delay
-      setTimeout(() => {
-        tagsContainerRef.current?.focus();
-      }, 100);
+    if (!editRecord && isOpen && tags && tags.length > 0) {
+      // Check if we need to auto-select (only when no tag is selected)
+      setSelectedTags(prev => {
+        if (prev.length === 0) {
+          setFocusedTagIndex(0);
+          // Focus on tags container after a short delay
+          setTimeout(() => {
+            tagsContainerRef.current?.focus();
+          }, 100);
+          return [tags[0].id];
+        }
+        return prev;
+      });
     }
-  }, [editRecord, isOpen, tags, selectedTags.length]);
+  }, [editRecord, isOpen, tags]);
 
   // Auto-fill first sub-item when tag is selected
   useEffect(() => {
