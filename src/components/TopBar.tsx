@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { db } from '@/lib/db';
 import { roundTime } from '@/lib/utils';
+import SettingsPage from './SettingsPage';
 
 function TopBar() {
   const [isRounding, setIsRounding] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleToggleRounding = async () => {
     const newState = !isRounding;
@@ -50,12 +52,19 @@ function TopBar() {
 
         {/* Settings button */}
         <button
+          onClick={() => setIsSettingsOpen(true)}
           className="px-4 py-2 text-sm border border-gray-300 rounded-full hover:bg-gray-100"
           title="Settings"
         >
           Settings
         </button>
       </div>
+
+      {/* Settings Modal */}
+      <SettingsPage 
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </div>
   );
 }
