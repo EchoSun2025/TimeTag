@@ -23,8 +23,8 @@ function createMainWindow() {
     },
   });
 
-  // Set fullscreen on startup
-  mainWindow.setFullScreen(true);
+  // Maximize window on startup (not fullscreen, to keep system menus visible)
+  mainWindow.maximize();
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
