@@ -34,16 +34,8 @@ function Timeline() {
 
   // Ensure fixed time records exist for current date
   useEffect(() => {
-    console.log('⏰ Timeline: ensureFixedTimeRecords called', {
-      tagsCount: tags?.length,
-      currentDate: currentDate.toISOString(),
-      timestamp: new Date().toISOString()
-    });
-    
     if (tags && tags.length > 0) {
-      ensureFixedTimeRecords(currentDate, tags).then(() => {
-        console.log('✅ Timeline: ensureFixedTimeRecords completed');
-      });
+      ensureFixedTimeRecords(currentDate, tags);
     }
   }, [currentDate, tags]);
 

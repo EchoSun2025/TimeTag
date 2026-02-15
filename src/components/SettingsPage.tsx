@@ -44,39 +44,8 @@ const TagEditor = React.memo(({
   handleCancel: () => void;
   dayNames: string[];
 }) => {
-  console.log('🎨 TagEditor rendered', { selectedTagId, editName, timestamp: new Date().toISOString() });
-  
   // Auto-focus on name input when editor opens
   const nameInputRef = React.useRef<HTMLInputElement>(null);
-  
-  React.useEffect(() => {
-    console.log('🎯 TagEditor mounted/updated, attempting to focus', { selectedTagId });
-    
-    // Delay focus to ensure DOM is fully rendered
-    const timeoutId = setTimeout(() => {
-      if (nameInputRef.current) {
-        nameInputRef.current.focus();
-        console.log('✅ Focus set on name input', {
-          hasFocus: document.activeElement === nameInputRef.current,
-          activeElement: document.activeElement?.tagName,
-          activeElementClass: document.activeElement?.className
-        });
-        
-        // Check again after 100ms to see if focus was stolen
-        setTimeout(() => {
-          console.log('🔍 Focus check after 100ms:', {
-            stillHasFocus: document.activeElement === nameInputRef.current,
-            activeElement: document.activeElement?.tagName,
-            inputElement: nameInputRef.current?.tagName
-          });
-        }, 100);
-      } else {
-        console.log('❌ nameInputRef.current is null');
-      }
-    }, 0);
-    
-    return () => clearTimeout(timeoutId);
-  }, [selectedTagId]); // Re-focus when tag changes
   
   return (
     <div className="space-y-6">
@@ -90,13 +59,7 @@ const TagEditor = React.memo(({
           ref={nameInputRef}
           type="text"
           value={editName}
-          onChange={(e) => {
-            console.log('✏️ Input changed:', e.target.value);
-            setEditName(e.target.value);
-          }}
-          onFocus={() => console.log('📌 Name input received focus event')}
-          onBlur={() => console.log('💨 Name input lost focus event (blur)')}
-          onClick={() => console.log('🖱️ Input clicked')}
+          onChange={(e) => setEditName(e.target.value)}
           autoFocus
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -273,42 +236,9 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const [editSubItems, setEditSubItems] = useState('');
   const [editSchedules, setEditSchedules] = useState<RecurringSchedule[]>([]);
 
-  // DEBUG: Track re-renders
-  React.useEffect(() => {
-    console.log('🔄 SettingsPage rendered', {
-      selectedTagId: selectedTag?.id,
-      selectedTagName: selectedTag?.name,
-      editName,
-      tagsCount: tags?.length,
-      timestamp: new Date().toISOString()
-    });
-  });
-
-  // DEBUG: Track tags changes
-  React.useEffect(() => {
-    console.log('📦 Tags updated from DB', {
-      count: tags?.length,
-      tags: tags?.map(t => ({ id: t.id, name: t.name })),
-      timestamp: new Date().toISOString()
-    });
-  }, [tags]);
-
-  // DEBUG: Track selectedTag changes
-  React.useEffect(() => {
-    console.log('🎯 SelectedTag changed', {
-      id: selectedTag?.id,
-      name: selectedTag?.name,
-      objectRef: selectedTag,
-      timestamp: new Date().toISOString()
-    });
-  }, [selectedTag]);
-
   const handleTagSelect = React.useCallback((tag: Tag) => {
-    console.log('👆 handleTagSelect called', { tagId: tag.id, tagName: tag.name, currentSelectedId: selectedTag?.id });
-    
     // If clicking the same tag, don't reset states (prevents losing focus)
     if (selectedTag?.id === tag.id) {
-      console.log('⏭️ Same tag selected, skipping state reset');
       return;
     }
     
@@ -320,12 +250,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   }, [selectedTag]);
 
   const handleSave = React.useCallback(async () => {
-    console.log('💾 handleSave called', {
-      selectedTagId: selectedTag?.id,
-      editName,
-      timestamp: new Date().toISOString()
-    });
-    
     if (!selectedTag) return;
 
     const subItems = editSubItems
@@ -347,7 +271,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     }
 
     await db.tags.update(selectedTag.id, updateData);
-    console.log('✅ Save completed', { tagId: selectedTag.id, updateData });
     // Don't update any local state - keep everything as is to maintain focus
   }, [selectedTag, editName, editIsLeisure, editSubItems, editSchedules]);
 
