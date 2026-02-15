@@ -18,7 +18,38 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const [editSubItems, setEditSubItems] = useState('');
   const [editSchedules, setEditSchedules] = useState<RecurringSchedule[]>([]);
 
+  // DEBUG: Track re-renders
+  React.useEffect(() => {
+    console.log('🔄 SettingsPage rendered', {
+      selectedTagId: selectedTag?.id,
+      selectedTagName: selectedTag?.name,
+      editName,
+      tagsCount: tags?.length,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // DEBUG: Track tags changes
+  React.useEffect(() => {
+    console.log('📦 Tags updated from DB', {
+      count: tags?.length,
+      tags: tags?.map(t => ({ id: t.id, name: t.name })),
+      timestamp: new Date().toISOString()
+    });
+  }, [tags]);
+
+  // DEBUG: Track selectedTag changes
+  React.useEffect(() => {
+    console.log('🎯 SelectedTag changed', {
+      id: selectedTag?.id,
+      name: selectedTag?.name,
+      objectRef: selectedTag,
+      timestamp: new Date().toISOString()
+    });
+  }, [selectedTag]);
+
   const handleTagSelect = (tag: Tag) => {
+    console.log('👆 handleTagSelect called', { tagId: tag.id, tagName: tag.name });
     setSelectedTag(tag);
     setEditName(tag.name);
     setEditIsLeisure(tag.isLeisure ?? false);
@@ -27,6 +58,12 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   };
 
   const handleSave = async () => {
+    console.log('💾 handleSave called', {
+      selectedTagId: selectedTag?.id,
+      editName,
+      timestamp: new Date().toISOString()
+    });
+    
     if (!selectedTag) return;
 
     const subItems = editSubItems
@@ -48,6 +85,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     }
 
     await db.tags.update(selectedTag.id, updateData);
+    console.log('✅ Save completed', { tagId: selectedTag.id, updateData });
     // Don't update any local state - keep everything as is to maintain focus
   };
 

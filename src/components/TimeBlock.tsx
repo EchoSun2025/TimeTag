@@ -140,8 +140,17 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('🗑️ TimeBlock: Delete clicked', {
+      recordId: record.id,
+      description: record.description,
+      timestamp: new Date().toISOString()
+    });
+    
     if (confirm('Delete this record?')) {
       await db.records.delete(record.id);
+      console.log('✅ TimeBlock: Record deleted', { recordId: record.id });
+    } else {
+      console.log('❌ TimeBlock: Delete cancelled');
     }
   };
 
