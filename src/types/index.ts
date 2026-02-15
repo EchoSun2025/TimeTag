@@ -17,6 +17,14 @@ export interface ActiveRecord {
   tags: string[];
 }
 
+export interface RecurringSchedule {
+  dayOfWeek: number; // 0=Sunday, 1=Monday, ... 6=Saturday
+  startHour: number;
+  startMinute: number;
+  endHour: number;
+  endMinute: number;
+}
+
 export interface Tag {
   id: string;
   name: string;
@@ -24,6 +32,7 @@ export interface Tag {
   isActive: boolean; // For filtering (gray out when inactive)
   isLeisure: boolean; // Leisure tags don't count in total hours
   subItems: string[]; // Sub-items list for quick selection
+  recurringSchedules?: RecurringSchedule[]; // Fixed time schedules
   createdAt: Date;
 }
 

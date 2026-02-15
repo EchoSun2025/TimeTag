@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { Tag } from '@/types';
+import { Tag, RecurringSchedule } from '@/types';
 
 interface SettingsPageProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const LEISURE_GREEN = '#86EFAC'; // Light green color for leisure tags
 
 function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const tags = useLiveQuery(() => db.tags.toArray(), []);
@@ -14,12 +16,14 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const [editName, setEditName] = useState('');
   const [editIsLeisure, setEditIsLeisure] = useState(false);
   const [editSubItems, setEditSubItems] = useState('');
+  const [editSchedules, setEditSchedules] = useState<RecurringSchedule[]>([]);
 
   const handleTagSelect = (tag: Tag) => {
     setSelectedTag(tag);
     setEditName(tag.name);
     setEditIsLeisure(tag.isLeisure ?? false);
     setEditSubItems((tag.subItems || []).join('\n'));
+    setEditSchedules(tag.recurringSchedules || []);
   };
 
   const handleSave = async () => {
@@ -30,11 +34,20 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       .map(item => item.trim())
       .filter(item => item.length > 0);
 
-    await db.tags.update(selectedTag.id, {
+    // Auto-change color to light green if marking as leisure
+    const updateData: any = {
       name: editName,
       isLeisure: editIsLeisure,
       subItems,
-    });
+      recurringSchedules: editSchedules,
+    };
+
+    // If marking as leisure, change color to light green
+    if (editIsLeisure && selectedTag.color !== LEISURE_GREEN) {
+      updateData.color = LEISURE_GREEN;
+    }
+
+    await db.tags.update(selectedTag.id, updateData);
 
     setSelectedTag(null);
   };
@@ -42,6 +55,35 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const handleCancel = () => {
     setSelectedTag(null);
   };
+
+  const handleAddSchedule = () => {
+    setEditSchedules([
+      ...editSchedules,
+      {
+        dayOfWeek: 1, // Monday
+        startHour: 12,
+        startMinute: 0,
+        endHour: 13,
+        endMinute: 0,
+      },
+    ]);
+  };
+
+  const handleRemoveSchedule = (index: number) => {
+    setEditSchedules(editSchedules.filter((_, i) => i !== index));
+  };
+
+  const handleScheduleChange = (
+    index: number,
+    field: keyof RecurringSchedule,
+    value: number
+  ) => {
+    const updated = [...editSchedules];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditSchedules(updated);
+  };
+
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   if (!isOpen) return null;
 
@@ -94,11 +136,14 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                       </span>
                     )}
                   </div>
-                  {tag.subItems && tag.subItems.length > 0 && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      {tag.subItems.length} sub-items
-                    </div>
-                  )}
+                  <div className="text-xs text-gray-500 mt-1 space-x-2">
+                    {tag.subItems && tag.subItems.length > 0 && (
+                      <span>{tag.subItems.length} sub-items</span>
+                    )}
+                    {tag.recurringSchedules && tag.recurringSchedules.length > 0 && (
+                      <span>• {tag.recurringSchedules.length} schedules</span>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
@@ -133,7 +178,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                     <div>
                       <div className="font-medium text-gray-700">Leisure Tag</div>
                       <div className="text-sm text-gray-500">
-                        Leisure tags are not counted in total hours
+                        Leisure tags are not counted in total hours and will be light green
                       </div>
                     </div>
                   </label>
@@ -151,13 +196,98 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                     value={editSubItems}
                     onChange={(e) => setEditSubItems(e.target.value)}
                     placeholder="e.g., for 'Work' tag:&#10;Can's work&#10;FX work&#10;Art work"
-                    rows={10}
+                    rows={6}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
                   />
-                  <div className="text-xs text-gray-500 mt-2">
-                    These items appear when you select this tag in a new record.
-                    Use ← → arrows to cycle through them.
-                    New descriptions are automatically added here.
+                </div>
+
+                {/* Recurring Schedules */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Fixed Time Schedules
+                    </label>
+                    <button
+                      onClick={handleAddSchedule}
+                      className="text-sm px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      + Add Schedule
+                    </button>
+                  </div>
+                  <div className="text-xs text-gray-500 mb-3">
+                    Automatically create time blocks for this tag on specific days
+                  </div>
+
+                  <div className="space-y-3">
+                    {editSchedules.map((schedule, index) => (
+                      <div key={index} className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                        <div className="flex items-center gap-2 mb-2">
+                          <select
+                            value={schedule.dayOfWeek}
+                            onChange={(e) => handleScheduleChange(index, 'dayOfWeek', parseInt(e.target.value))}
+                            className="px-2 py-1 border border-gray-300 rounded text-sm"
+                          >
+                            {dayNames.map((day, i) => (
+                              <option key={i} value={i}>{day}</option>
+                            ))}
+                          </select>
+
+                          <input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={schedule.startHour}
+                            onChange={(e) => handleScheduleChange(index, 'startHour', parseInt(e.target.value))}
+                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                          <span>:</span>
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={schedule.startMinute}
+                            onChange={(e) => handleScheduleChange(index, 'startMinute', parseInt(e.target.value))}
+                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+
+                          <span className="text-gray-500">to</span>
+
+                          <input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={schedule.endHour}
+                            onChange={(e) => handleScheduleChange(index, 'endHour', parseInt(e.target.value))}
+                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                          <span>:</span>
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={schedule.endMinute}
+                            onChange={(e) => handleScheduleChange(index, 'endMinute', parseInt(e.target.value))}
+                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+
+                          <button
+                            onClick={() => handleRemoveSchedule(index)}
+                            className="ml-auto text-red-500 hover:text-red-700"
+                          >
+                            ×
+                          </button>
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {dayNames[schedule.dayOfWeek]} {String(schedule.startHour).padStart(2, '0')}:{String(schedule.startMinute).padStart(2, '0')} - {String(schedule.endHour).padStart(2, '0')}:{String(schedule.endMinute).padStart(2, '0')}
+                        </div>
+                      </div>
+                    ))}
+
+                    {editSchedules.length === 0 && (
+                      <div className="text-sm text-gray-400 text-center py-4">
+                        No fixed schedules. Click "+ Add Schedule" to create one.
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -190,8 +320,8 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
 
         {/* Footer hint */}
         <div className="px-6 py-3 border-t border-gray-200 bg-gray-50 text-xs text-gray-600">
-          <strong>Tip:</strong> Set frequently used activities as sub-items for quick access.
-          For example, "Work" tag can have sub-items like "Client meeting", "Code review", "Documentation".
+          <strong>Tip:</strong> Fixed schedules automatically create time blocks. 
+          Example: "Meal" on Monday-Friday 12:00-13:00 will appear on timeline every weekday at noon.
         </div>
       </div>
     </div>

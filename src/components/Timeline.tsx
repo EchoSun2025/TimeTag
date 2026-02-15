@@ -6,6 +6,7 @@ import RecordModal from './RecordModal';
 import TimeBlock from './TimeBlock';
 import { TimeRecord } from '@/types';
 import { calculateOverlappingLayout } from '@/lib/layout';
+import { generateFixedTimeRecords } from '@/lib/fixedSchedules';
 
 function Timeline() {
   const { timelineZoom, setTimelineZoom, currentDate } = useAppStore();
@@ -31,11 +32,18 @@ function Timeline() {
   // Fetch tags
   const tags = useLiveQuery(() => db.tags.toArray(), []);
 
+  // Combine real records with fixed schedule records
+  const allRecords = useMemo(() => {
+    if (!records || !tags) return [];
+    const fixedRecords = generateFixedTimeRecords(currentDate, tags);
+    return [...records, ...fixedRecords];
+  }, [records, tags, currentDate]);
+
   // Calculate overlapping layout
   const recordsWithLayout = useMemo(() => {
-    if (!records) return [];
-    return calculateOverlappingLayout(records);
-  }, [records]);
+    if (!allRecords) return [];
+    return calculateOverlappingLayout(allRecords);
+  }, [allRecords]);
 
   const handleZoomIn = () => {
     if (timelineZoom >= 5 || !containerRef.current) return;

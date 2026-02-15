@@ -28,6 +28,9 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
   
   const { settings, startRecording } = useAppStore();
 
+  // Check if this is a fixed schedule record (ID starts with 'fixed-')
+  const isFixedSchedule = record.id.startsWith('fixed-');
+
   const startTime = new Date(record.startTime).getTime();
   const endTime = new Date(record.endTime).getTime();
   
@@ -52,6 +55,9 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
   const leftPercent = column * columnWidth;
 
   const handleMouseDown = (e: React.MouseEvent, mode: DragMode) => {
+    // Fixed schedule blocks cannot be dragged
+    if (isFixedSchedule) return;
+    
     e.stopPropagation();
     setIsDragging(true);
     setDragMode(mode);
@@ -160,34 +166,47 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
       }}
     >
       {/* Resize handle - Top */}
-      <div
-        className="absolute top-0 left-0 right-0 h-3 cursor-ns-resize hover:bg-black/10 transition-colors z-20"
-        onMouseDown={(e) => handleMouseDown(e, 'resize-top')}
-        title="Drag to adjust start time"
-      />
+      {!isFixedSchedule && (
+        <div
+          className="absolute top-0 left-0 right-0 h-3 cursor-ns-resize hover:bg-black/10 transition-colors z-20"
+          onMouseDown={(e) => handleMouseDown(e, 'resize-top')}
+          title="Drag to adjust start time"
+        />
+      )}
 
       {/* Main block */}
       <div
-        className={`h-full rounded border-l-4 px-2 py-1 overflow-hidden cursor-move hover:brightness-110 transition-all relative ${
-          isDragging ? 'opacity-70 shadow-lg' : ''
+        className={`h-full rounded border-l-4 px-2 py-1 overflow-hidden transition-all relative ${
+          isFixedSchedule 
+            ? 'cursor-default opacity-60' 
+            : `cursor-move hover:brightness-110 ${isDragging ? 'opacity-70 shadow-lg' : ''}`
         }`}
         style={{
           backgroundColor,
           borderColor,
         }}
-        onMouseDown={(e) => handleMouseDown(e, 'move')}
-        onDoubleClick={handleDoubleClick}
+        onMouseDown={(e) => !isFixedSchedule && handleMouseDown(e, 'move')}
+        onDoubleClick={(e) => !isFixedSchedule && handleDoubleClick(e)}
         onMouseEnter={() => {
-          setShowDelete(true);
-          setShowContinue(true);
+          if (!isFixedSchedule) {
+            setShowDelete(true);
+            setShowContinue(true);
+          }
         }}
         onMouseLeave={() => {
           setShowDelete(false);
           setShowContinue(false);
         }}
       >
-        {/* Delete button - top right corner */}
-        {showDelete && !isDragging && (
+        {/* Fixed schedule indicator */}
+        {isFixedSchedule && (
+          <div className="absolute top-1 left-1 text-[10px] bg-gray-800/70 text-white px-1 rounded z-30">
+            Fixed
+          </div>
+        )}
+
+        {/* Delete button - top right corner (not for fixed schedules) */}
+        {showDelete && !isDragging && !isFixedSchedule && (
           <button
             onClick={handleDelete}
             onMouseDown={(e) => e.stopPropagation()}
@@ -199,7 +218,7 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
         )}
 
         {/* Continue button - top left corner */}
-        {showContinue && !isDragging && (
+        {showContinue && !isDragging && !isFixedSchedule && (
           <button
             onClick={handleContinue}
             onMouseDown={(e) => e.stopPropagation()}
@@ -242,11 +261,13 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
       </div>
 
       {/* Resize handle - Bottom */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize hover:bg-black/10 transition-colors z-20"
-        onMouseDown={(e) => handleMouseDown(e, 'resize-bottom')}
-        title="Drag to adjust end time"
-      />
+      {!isFixedSchedule && (
+        <div
+          className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize hover:bg-black/10 transition-colors z-20"
+          onMouseDown={(e) => handleMouseDown(e, 'resize-bottom')}
+          title="Drag to adjust end time"
+        />
+      )}
     </div>
   );
 }
