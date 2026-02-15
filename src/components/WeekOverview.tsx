@@ -7,13 +7,13 @@ import { calculateDayStats, getDayTimeRange, formatMinutesToHM } from '@/lib/sta
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import MonthView from './MonthView';
 
-type ViewMode = '5days' | 'week' | 'month';
+type ViewMode = '5days' | '7days' | 'month';
 
 function WeekOverview() {
   const { currentDate, showWeekExpanded, setShowWeekExpanded } = useAppStore();
   const [viewMode, setViewMode] = useState<ViewMode>('5days');
   
-  const weekDaysCount = viewMode === '5days' ? 5 : 7;
+  const weekDaysCount = viewMode === '5days' ? 5 : viewMode === '7days' ? 7 : 7;
 
   const weekDays = getWeekDays(currentDate, weekDaysCount);
 
@@ -65,8 +65,8 @@ function WeekOverview() {
 
   const toggleWeekDays = () => {
     if (viewMode === '5days') {
-      setViewMode('week');
-    } else if (viewMode === 'week') {
+      setViewMode('7days');
+    } else if (viewMode === '7days') {
       setViewMode('month');
     } else {
       setViewMode('5days');
@@ -108,7 +108,11 @@ function WeekOverview() {
         {/* Month navigation */}
         <div className="flex items-center gap-4 mb-6">
           {/* Month date navigation */}
-          <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
+          <div className="rounded-lg px-6 py-4 flex items-center gap-4" style={{
+            backgroundColor: 'var(--accent-bg)',
+            borderWidth: '1px',
+            borderColor: 'var(--accent-border)'
+          }}>
             <button
               onClick={handlePrevPeriod}
               className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
@@ -129,24 +133,34 @@ function WeekOverview() {
           </div>
 
           {/* View mode buttons */}
-          <div className="flex bg-yellow-50/50 border border-yellow-200 rounded-full overflow-hidden">
+          <div className="flex rounded-full overflow-hidden" style={{
+            backgroundColor: 'var(--accent-bg)',
+            borderWidth: '1px',
+            borderColor: 'var(--accent-border)'
+          }}>
             <button
               onClick={jumpToThisWeek}
-              className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-r border-yellow-200"
+              className="px-6 py-2.5 text-base transition-colors"
+              style={{
+                color: 'var(--text-primary)',
+                borderRight: `1px solid var(--accent-border)`
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               This Week
             </button>
             <button
-              onClick={() => setViewMode('5days')}
-              className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-r border-yellow-200"
+              onClick={toggleWeekDays}
+              className="px-6 py-2.5 text-base transition-colors"
+              style={{
+                color: 'var(--text-primary)',
+                borderRight: `1px solid var(--accent-border)`
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
-              5 Days
-            </button>
-            <button
-              onClick={() => setViewMode('month')}
-              className="px-6 py-2.5 text-base bg-yellow-200 font-semibold"
-            >
-              Month
+              {viewMode === 'month' ? '5 Days' : 'Month'}
             </button>
           </div>
         </div>
@@ -209,36 +223,12 @@ function WeekOverview() {
             This Week
           </button>
           <button
-            onClick={() => setViewMode('5days')}
-            className={`px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-r border-yellow-200 ${
-              viewMode === '5days' ? 'bg-yellow-200 font-semibold' : ''
-            }`}
+            onClick={toggleWeekDays}
+            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors"
           >
-            5 Days
-          </button>
-          <button
-            onClick={() => setViewMode('week')}
-            className={`px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors ${
-              viewMode === 'week' ? 'bg-yellow-200 font-semibold' : ''
-            }`}
-          >
-            7 Days
-          </button>
-          <button
-            onClick={() => setViewMode('month')}
-            className="px-6 py-2.5 text-base hover:bg-yellow-100 transition-colors border-l border-yellow-200"
-          >
-            Month
+            {viewMode === '5days' ? '7 Days' : '5 Days'}
           </button>
         </div>
-
-        {/* Expand button */}
-        <button
-          onClick={() => setShowWeekExpanded(!showWeekExpanded)}
-          className="px-6 py-2.5 text-base bg-yellow-50/50 border border-yellow-200 rounded-full hover:bg-yellow-100 transition-colors"
-        >
-          {showWeekExpanded ? 'Mini Timeline' : 'Expand'}
-        </button>
 
         {/* Week total card with tag breakdown */}
         <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">

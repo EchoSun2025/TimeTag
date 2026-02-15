@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { Tag, RecurringSchedule } from '@/types';
 import ReminderSettings from './ReminderSettings';
+import DataManagerModal from './DataManagerModal';
 
 interface SettingsPageProps {
   isOpen: boolean;
@@ -305,7 +306,7 @@ const MemoizedTagEditor = React.memo(TagEditor, arePropsEqual);
 function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const tags = useLiveQuery(() => db.tags.toArray(), []);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
-  const [activeTab, setActiveTab] = useState<'tags' | 'reminders'>('tags');
+  const [activeTab, setActiveTab] = useState<'tags' | 'reminders' | 'data'>('tags');
   const [editName, setEditName] = useState('');
   const [editIsLeisure, setEditIsLeisure] = useState(false);
   const [editColor, setEditColor] = useState(TAG_COLORS[0]);
@@ -467,6 +468,16 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
           >
             Reminder Settings
           </button>
+          <button
+            onClick={() => setActiveTab('data')}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === 'data'
+                ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            }`}
+          >
+            Data Management
+          </button>
         </div>
 
         {/* Content */}
@@ -553,11 +564,18 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
               Example: "Meal" on Monday-Friday 12:00-13:00 will appear on timeline every weekday at noon.
             </div>
           </>
-        ) : (
+        ) : activeTab === 'reminders' ? (
           <>
             {/* Reminder Settings Content */}
             <div className="flex-1 overflow-y-auto">
               <ReminderSettings />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Data Management Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <DataManagerModal isOpen={true} onClose={() => {}} embedded={true} />
             </div>
           </>
         )}

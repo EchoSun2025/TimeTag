@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  /* Light mode (default) */
+  /* Light mode (default) */}
   :root {
     --bg-primary: #ffffff;
     --bg-secondary: #f9fafb;
@@ -14,19 +14,23 @@
     --text-muted: #9ca3af;
     --border-color: #d1d5db;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --accent-bg: #fef3c7;  /* Light yellow for cards */
+    --accent-border: #fde68a;
   }
 
-  /* Dark mode - based on TimeRecord v1 */
+  /* Dark mode - based on TimeRecord v1 with deep blue accent */
   .dark {
     --bg-primary: #0f0f14;
     --bg-secondary: #1a1a24;
     --bg-tertiary: #252532;
     --bg-hover: #2a2a3a;
     --text-primary: #e4e4e7;
-    --text-secondary: #71717a;
-    --text-muted: #52525b;
+    --text-secondary: #a1a1aa;  /* Brighter in dark mode */
+    --text-muted: #71717a;  /* Brighter in dark mode */
     --border-color: #27272a;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --accent-bg: #1e3a5f;  /* Deep blue instead of yellow */
+    --accent-border: #2a4a70;
   }
 
   body {

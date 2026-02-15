@@ -4,9 +4,10 @@ import { downloadExport, parseImportData, importDataMerge, importDataReplace } f
 interface DataManagerModalProps {
   isOpen: boolean;
   onClose: () => void;
+  embedded?: boolean; // New prop for embedded mode
 }
 
-function DataManagerModal({ isOpen, onClose }: DataManagerModalProps) {
+function DataManagerModal({ isOpen, onClose, embedded = false }: DataManagerModalProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importMode, setImportMode] = useState<'merge' | 'replace'>('merge');
@@ -15,7 +16,7 @@ function DataManagerModal({ isOpen, onClose }: DataManagerModalProps) {
   const [exportEndDate, setExportEndDate] = useState<string>('');
   const [exportAllData, setExportAllData] = useState(true);
 
-  if (!isOpen) return null;
+  if (!isOpen && !embedded) return null;
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -90,14 +91,152 @@ function DataManagerModal({ isOpen, onClose }: DataManagerModalProps) {
     setIsImporting(false);
   };
 
+  // Embedded mode: render without modal wrapper
+  if (embedded) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Data Management</h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Export and import your time tracking data
+          </p>
+        </div>
+
+        {/* Export Section */}
+        <div className="border rounded-lg p-6 space-y-4" style={{ borderColor: 'var(--border-color)' }}>
+          <h3 className="text-xl font-semibold mb-4">Export Data</h3>
+          
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={exportAllData}
+                  onChange={() => setExportAllData(true)}
+                  className="w-4 h-4"
+                />
+                <span>Export all data</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={!exportAllData}
+                  onChange={() => setExportAllData(false)}
+                  className="w-4 h-4"
+                />
+                <span>Export date range</span>
+              </label>
+            </div>
+
+            {!exportAllData && (
+              <div className="flex items-center gap-4 ml-6">
+                <div>
+                  <label className="text-sm block mb-1" style={{ color: 'var(--text-secondary)' }}>Start Date</label>
+                  <input
+                    type="date"
+                    value={exportStartDate}
+                    onChange={(e) => setExportStartDate(e.target.value)}
+                    className="px-3 py-2 border rounded dark:bg-gray-800"
+                    style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm block mb-1" style={{ color: 'var(--text-secondary)' }}>End Date</label>
+                  <input
+                    type="date"
+                    value={exportEndDate}
+                    onChange={(e) => setExportEndDate(e.target.value)}
+                    className="px-3 py-2 border rounded dark:bg-gray-800"
+                    style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={handleExport}
+              disabled={isExporting}
+              className="px-6 py-2.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400 transition-colors"
+            >
+              {isExporting ? 'Exporting...' : 'Export to JSON'}
+            </button>
+          </div>
+        </div>
+
+        {/* Import Section */}
+        <div className="border rounded-lg p-6 space-y-4" style={{ borderColor: 'var(--border-color)' }}>
+          <h3 className="text-xl font-semibold mb-4">Import Data</h3>
+          
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={importMode === 'merge'}
+                  onChange={() => setImportMode('merge')}
+                  className="w-4 h-4"
+                />
+                <span>Merge with existing data</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={importMode === 'replace'}
+                  onChange={() => setImportMode('replace')}
+                  className="w-4 h-4"
+                />
+                <span className="text-red-600 dark:text-red-400">Replace all data</span>
+              </label>
+            </div>
+
+            <div className="text-sm p-3 rounded" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>
+              <strong>Merge mode:</strong> Adds new records and tags, updates existing tags with matching names.
+              <br />
+              <strong className="text-red-600 dark:text-red-400">Replace mode:</strong> Deletes all existing data and replaces it with imported data.
+            </div>
+
+            <label className="inline-block px-6 py-2.5 bg-green-500 text-white rounded-md hover:bg-green-600 cursor-pointer transition-colors">
+              {isImporting ? 'Importing...' : 'Select JSON File to Import'}
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                disabled={isImporting}
+                className="hidden"
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* Result Message */}
+        {importResult && (
+          <div className={`p-4 rounded whitespace-pre-line ${
+            importResult.startsWith('✅') 
+              ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300' 
+              : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300'
+          }`}>
+            {importResult}
+          </div>
+        )}
+
+        {/* Format Notice */}
+        <div className="text-sm border-t pt-4" style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
+          <strong>Compatible with TimeRecord v1 format:</strong> You can import data exported from TimeRecord v1. 
+          The "isExcluded" field will be automatically mapped to "isLeisure".
+        </div>
+      </div>
+    );
+  }
+
+  // Modal mode
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto" style={{ color: 'var(--text-primary)' }}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">Data Management</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
+            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
           >
             ✕
           </button>

@@ -71,51 +71,77 @@ function DayControl() {
   return (
     <div className="flex items-center gap-4 h-full">
       {/* Date navigation with background card */}
-      <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg px-6 py-4 flex items-center gap-4">
+      <div className="rounded-lg px-6 py-4 flex items-center gap-4" style={{ 
+        backgroundColor: 'var(--accent-bg)',
+        borderWidth: '1px',
+        borderColor: 'var(--accent-border)'
+      }}>
         <button
           onClick={handlePrevDay}
-          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
+          className="w-10 h-10 flex items-center justify-center rounded text-xl transition-colors"
+          style={{ 
+            color: 'var(--text-primary)',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
           &lt;
         </button>
         
-        <div className="text-xl font-sans">
+        <div className="text-xl font-sans font-bold" style={{ color: 'var(--text-primary)' }}>
           {formatDate(currentDate)}
         </div>
         
         <button
           onClick={handleNextDay}
-          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded text-xl"
+          className="w-10 h-10 flex items-center justify-center rounded text-xl transition-colors"
+          style={{ 
+            color: 'var(--text-primary)',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
           &gt;
         </button>
       </div>
 
-      {/* Today button - outside with deeper yellow background */}
+      {/* Today button */}
       <button
         onClick={handleToday}
-        className="px-6 py-2.5 text-base bg-yellow-100 border border-yellow-300 rounded-full hover:bg-yellow-200 transition-colors"
+        className="px-6 py-2.5 text-base rounded-full transition-colors"
+        style={{
+          backgroundColor: 'var(--accent-bg)',
+          borderWidth: '1px',
+          borderColor: 'var(--accent-border)',
+          color: 'var(--text-primary)'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
       >
         Today
       </button>
 
       {/* Total hours card with tag breakdown */}
-      <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">
+      <div className="rounded-lg p-4 flex items-center gap-6" style={{
+        backgroundColor: 'var(--accent-bg)',
+        borderWidth: '1px',
+        borderColor: 'var(--accent-border)'
+      }}>
         <div>
-          <div className="text-sm text-gray-600 mb-1">Total Hours</div>
-          <div className="text-3xl font-semibold">{totalTime.hours}h {totalTime.minutes}m</div>
+          <div className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Total Hours</div>
+          <div className="text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>{totalTime.hours}h {totalTime.minutes}m</div>
         </div>
         
         {/* Tag breakdown inline */}
         {tagBreakdown.length > 0 && (
-          <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
+          <div className="flex items-center gap-4 pl-6" style={{ borderLeft: `1px solid var(--border-color)` }}>
             {tagBreakdown.map((tag) => (
               <div key={tag.name} className="flex items-center gap-2">
                 <div 
                   className="w-3 h-3 rounded-full flex-shrink-0"
                   style={{ backgroundColor: tag.color }}
                 />
-                <span className="font-mono text-base">{tag.hours}h {tag.minutes}m</span>
+                <span className="font-mono text-base" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
               </div>
             ))}
           </div>

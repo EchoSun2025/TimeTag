@@ -284,7 +284,7 @@ function Timeline() {
   const dayStartTimestamp = dayStart.getTime();
 
   return (
-    <div className="h-full flex flex-col bg-yellow-50 relative">
+    <div className="h-full flex flex-col relative" style={{ backgroundColor: 'var(--accent-bg)' }}>
       {/* Floating zoom controls */}
       <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         <button
