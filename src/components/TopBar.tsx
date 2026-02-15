@@ -4,10 +4,12 @@ import { db } from '@/lib/db';
 import { roundTime } from '@/lib/utils';
 import { useAppStore } from '@/stores/appStore';
 import SettingsPage from './SettingsPage';
+import DataManagerModal from './DataManagerModal';
 
 function TopBar() {
   const [isRounding, setIsRounding] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDataManagerOpen, setIsDataManagerOpen] = useState(false);
   const { activeRecord, stopRecording, startRecording, currentDate } = useAppStore();
   
   // Get today's records to find the most recent one
@@ -135,6 +137,15 @@ function TopBar() {
           15min Round {isRounding ? 'ON' : 'OFF'}
         </button>
 
+        {/* Data Import/Export button */}
+        <button
+          onClick={() => setIsDataManagerOpen(true)}
+          className="px-4 py-2 text-sm border border-gray-300 rounded-full hover:bg-gray-100"
+          title="Import/Export Data"
+        >
+          Data
+        </button>
+
         {/* Settings button */}
         <button
           onClick={() => setIsSettingsOpen(true)}
@@ -149,6 +160,12 @@ function TopBar() {
       <SettingsPage 
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      {/* Data Manager Modal */}
+      <DataManagerModal
+        isOpen={isDataManagerOpen}
+        onClose={() => setIsDataManagerOpen(false)}
       />
     </div>
   );
