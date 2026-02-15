@@ -58,6 +58,8 @@ function createMiniWindow() {
 
   if (isDev) {
     miniWindow.loadURL('http://localhost:5173#/mini');
+    // Open DevTools for debugging mini window
+    miniWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
     miniWindow.loadFile(path.join(__dirname, '../dist/index.html'), {
       hash: 'mini',

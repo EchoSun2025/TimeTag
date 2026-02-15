@@ -8,6 +8,17 @@ function MiniWindow() {
   const [elapsed, setElapsed] = useState(0);
   const tags = useLiveQuery(() => db.tags.toArray(), []);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('🎨 MiniWindow rendered:', {
+      hasActiveRecord: !!activeRecord,
+      elapsed,
+      windowSize: { width: window.innerWidth, height: window.innerHeight },
+      bodyBg: window.getComputedStyle(document.body).backgroundColor,
+      htmlBg: window.getComputedStyle(document.documentElement).backgroundColor
+    });
+  }, [activeRecord, elapsed]);
+
   // Update elapsed time every second
   useEffect(() => {
     if (!activeRecord) {
@@ -34,10 +45,12 @@ function MiniWindow() {
   if (!activeRecord) {
     return (
       <div 
-        className="w-full h-full flex items-center justify-center text-white rounded-2xl shadow-2xl"
+        className="w-full h-full flex items-center justify-center text-white shadow-2xl"
         style={{ 
           WebkitAppRegion: 'drag',
-          backgroundColor: '#1a1a24'
+          backgroundColor: '#1a1a24',
+          borderRadius: '16px',
+          border: '2px solid #2a4a70'
         } as any}
       >
         <div className="text-center text-sm opacity-70">
@@ -60,12 +73,14 @@ function MiniWindow() {
 
   return (
     <div 
-      className="w-full h-full flex items-center text-white rounded-2xl shadow-2xl px-3 gap-2"
+      className="w-full h-full flex items-center text-white shadow-2xl px-3 gap-2"
       style={{ 
         WebkitAppRegion: 'drag', 
         paddingTop: '7px', 
         paddingBottom: '7px',
-        backgroundColor: '#1a1a24'
+        backgroundColor: '#1a1a24',
+        borderRadius: '16px',
+        border: '2px solid #2a4a70'
       } as any}
     >
       {/* Timer - 0.7x size, teal color */}

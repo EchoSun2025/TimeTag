@@ -65,7 +65,34 @@ function App() {
 
   // Render mini window if in mini mode
   if (urlIsMiniMode || isMiniMode) {
-    return <MiniWindow />;
+    // Set transparent background for mini window
+    useEffect(() => {
+      document.body.style.backgroundColor = 'transparent';
+      document.documentElement.style.backgroundColor = 'transparent';
+      // Add some debug info
+      console.log('🔍 Mini mode DEBUG:', {
+        urlHash: window.location.hash,
+        isMiniMode,
+        bodyBg: document.body.style.backgroundColor,
+        htmlBg: document.documentElement.style.backgroundColor,
+        rootDiv: document.getElementById('root')
+      });
+      return () => {
+        document.body.style.backgroundColor = '';
+        document.documentElement.style.backgroundColor = '';
+      };
+    }, []);
+    
+    return (
+      <div style={{ 
+        backgroundColor: 'transparent',
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden'
+      }}>
+        <MiniWindow />
+      </div>
+    );
   }
 
   const handleStartRecording = (description: string, tags: string[]) => {
