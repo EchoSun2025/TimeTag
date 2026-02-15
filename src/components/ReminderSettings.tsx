@@ -72,7 +72,10 @@ function ReminderSettings() {
       </div>
 
       {/* Normal (Work/Study) tags settings */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4">
+      <div className="rounded-lg p-6 space-y-4" style={{
+        borderWidth: '1px',
+        borderColor: 'var(--border-color)'
+      }}>
         <div>
           <h3 className="text-lg font-semibold mb-1">Normal Tags (Work/Study)</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -91,9 +94,14 @@ function ReminderSettings() {
             max="999"
             value={normalInterval}
             onChange={(e) => setNormalInterval(parseInt(e.target.value) || 90)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded w-32"
+            className="px-3 py-2 border rounded w-32"
+            style={{
+              borderColor: 'var(--border-color)',
+              backgroundColor: 'var(--bg-secondary)',
+              color: 'var(--text-primary)'
+            }}
           />
-          <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+          <span className="ml-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
             (Default: 90 minutes)
           </span>
         </div>
@@ -134,7 +142,12 @@ function ReminderSettings() {
               onChange={(e) => setNormalCustomMessage(e.target.value)}
               rows={3}
               placeholder="e.g. Time to take a break! Stretch and drink some water."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded resize-none"
+              className="w-full px-3 py-2 border rounded resize-none"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-secondary)',
+                color: 'var(--text-primary)'
+              }}
             />
           </div>
         )}
@@ -151,7 +164,10 @@ function ReminderSettings() {
       </div>
 
       {/* Leisure tags settings */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4">
+      <div className="rounded-lg p-6 space-y-4" style={{
+        borderWidth: '1px',
+        borderColor: 'var(--border-color)'
+      }}>
         <div>
           <h3 className="text-lg font-semibold mb-1">Leisure Tags</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -170,9 +186,14 @@ function ReminderSettings() {
             max="999"
             value={leisureInterval}
             onChange={(e) => setLeisureInterval(parseInt(e.target.value) || 30)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded w-32"
+            className="px-3 py-2 border rounded w-32"
+            style={{
+              borderColor: 'var(--border-color)',
+              backgroundColor: 'var(--bg-secondary)',
+              color: 'var(--text-primary)'
+            }}
           />
-          <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+          <span className="ml-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
             (Default: 30 minutes)
           </span>
         </div>
@@ -213,7 +234,12 @@ function ReminderSettings() {
               onChange={(e) => setLeisureCustomMessage(e.target.value)}
               rows={3}
               placeholder="e.g. Hey! Time to get back to work!"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded resize-none"
+              className="w-full px-3 py-2 border rounded resize-none"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-secondary)',
+                color: 'var(--text-primary)'
+              }}
             />
           </div>
         )}

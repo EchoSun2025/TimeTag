@@ -97,7 +97,7 @@ const TagEditor = React.memo(({
     <div className="space-y-6">
       {/* Tag Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
           Tag Name
         </label>
         <input
@@ -106,7 +106,12 @@ const TagEditor = React.memo(({
           type="text"
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{
+            borderColor: 'var(--border-color)',
+            backgroundColor: 'var(--bg-secondary)',
+            color: 'var(--text-primary)'
+          }}
         />
       </div>
 
@@ -120,8 +125,8 @@ const TagEditor = React.memo(({
             className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
           />
           <div>
-            <div className="font-medium text-gray-700">Leisure Tag</div>
-            <div className="text-sm text-gray-500">
+            <div className="font-medium" style={{ color: 'var(--text-primary)' }}>Leisure Tag</div>
+            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Leisure tags are not counted in total hours and will be light green
             </div>
           </div>
@@ -130,7 +135,7 @@ const TagEditor = React.memo(({
 
       {/* Color Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
           Tag Color
         </label>
         <div className="grid grid-cols-8 gap-2">
@@ -153,9 +158,9 @@ const TagEditor = React.memo(({
 
       {/* Sub-items */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
           Sub-items
-          <span className="text-xs text-gray-400 ml-2">
+          <span className="text-xs ml-2" style={{ color: 'var(--text-muted)' }}>
             (One per line)
           </span>
         </label>
@@ -164,14 +169,19 @@ const TagEditor = React.memo(({
           onChange={(e) => setEditSubItems(e.target.value)}
           placeholder="e.g., for 'Work' tag:&#10;Can's work&#10;FX work&#10;Art work"
           rows={6}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+          style={{
+            borderColor: 'var(--border-color)',
+            backgroundColor: 'var(--bg-secondary)',
+            color: 'var(--text-primary)'
+          }}
         />
       </div>
 
       {/* Recurring Schedules */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
             Fixed Time Schedules
           </label>
           <button
@@ -181,18 +191,27 @@ const TagEditor = React.memo(({
             + Add Schedule
           </button>
         </div>
-        <div className="text-xs text-gray-500 mb-3">
+        <div className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>
           Automatically create time blocks for this tag on specific days
         </div>
 
         <div className="space-y-3">
           {editSchedules.map((schedule, index) => (
-            <div key={index} className="border border-gray-200 rounded-md p-3 bg-gray-50">
+            <div key={index} className="rounded-md p-3" style={{
+              borderWidth: '1px',
+              borderColor: 'var(--border-color)',
+              backgroundColor: 'var(--bg-secondary)'
+            }}>
               <div className="flex items-center gap-2 mb-2">
                 <select
                   value={schedule.dayOfWeek}
                   onChange={(e) => handleScheduleChange(index, 'dayOfWeek', parseInt(e.target.value))}
-                  className="px-2 py-1 border border-gray-300 rounded text-sm"
+                  className="px-2 py-1 border rounded text-sm"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    color: 'var(--text-primary)'
+                  }}
                 >
                   {dayNames.map((day, i) => (
                     <option key={i} value={i}>{day}</option>
@@ -205,7 +224,12 @@ const TagEditor = React.memo(({
                   max="23"
                   value={schedule.startHour}
                   onChange={(e) => handleScheduleChange(index, 'startHour', e.target.value)}
-                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                  className="w-16 px-2 py-1 border rounded text-sm"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
                 <span>:</span>
                 <input
@@ -214,10 +238,15 @@ const TagEditor = React.memo(({
                   max="59"
                   value={schedule.startMinute}
                   onChange={(e) => handleScheduleChange(index, 'startMinute', e.target.value)}
-                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                  className="w-16 px-2 py-1 border rounded text-sm"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
 
-                <span className="text-gray-500">to</span>
+                <span style={{ color: 'var(--text-secondary)' }}>to</span>
 
                 <input
                   type="number"
@@ -225,7 +254,12 @@ const TagEditor = React.memo(({
                   max="23"
                   value={schedule.endHour}
                   onChange={(e) => handleScheduleChange(index, 'endHour', e.target.value)}
-                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                  className="w-16 px-2 py-1 border rounded text-sm"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
                 <span>:</span>
                 <input
@@ -234,7 +268,12 @@ const TagEditor = React.memo(({
                   max="59"
                   value={schedule.endMinute}
                   onChange={(e) => handleScheduleChange(index, 'endMinute', e.target.value)}
-                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                  className="w-16 px-2 py-1 border rounded text-sm"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
 
                 <button
@@ -438,8 +477,9 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       {/* Modal */}
       <div 
         ref={modalRef}
-        className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col"
+        className="relative rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col"
         style={{ 
+          backgroundColor: 'var(--bg-primary)',
           color: 'var(--text-primary)'
         }}
       >
