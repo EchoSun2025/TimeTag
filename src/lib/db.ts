@@ -53,6 +53,26 @@ export class TimeTagDatabase extends Dexie {
         await trans.table('tags').update(tag.id, updates);
       }
     });
+
+    // Version 4: Add TTS/reminder settings
+    this.version(4).stores({
+      records: 'id, startTime, endTime, *tags, createdAt',
+      tags: 'id, name, createdAt',
+      settings: '++id',
+    }).upgrade(async (trans) => {
+      const settings = await trans.table('settings').toArray();
+      for (const setting of settings) {
+        await trans.table('settings').update(setting.id, {
+          reminderEnabled: setting.reminderEnabled ?? false,
+          normalInterval: setting.normalInterval ?? 90,
+          normalMessageMode: setting.normalMessageMode ?? 'random',
+          normalCustomMessage: setting.normalCustomMessage ?? '',
+          leisureInterval: setting.leisureInterval ?? 30,
+          leisureMessageMode: setting.leisureMessageMode ?? 'random',
+          leisureCustomMessage: setting.leisureCustomMessage ?? '',
+        });
+      }
+    });
   }
 }
 
@@ -68,6 +88,13 @@ export async function initializeDefaultSettings() {
       defaultStartHour: 8,
       defaultEndHour: 21,
       weekDaysCount: 5,
+      reminderEnabled: false,
+      normalInterval: 90,
+      normalMessageMode: 'random',
+      normalCustomMessage: '',
+      leisureInterval: 30,
+      leisureMessageMode: 'random',
+      leisureCustomMessage: '',
     });
   }
 }

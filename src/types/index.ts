@@ -42,6 +42,14 @@ export interface Settings {
   defaultStartHour: number; // Default 8 (8am)
   defaultEndHour: number; // Default 21 (9pm)
   weekDaysCount: 5 | 7; // 5-day or 7-day week view
+  // TTS/Reminder settings
+  reminderEnabled: boolean;
+  normalInterval: number; // Normal tag reminder interval (minutes)
+  normalMessageMode: 'random' | 'custom';
+  normalCustomMessage: string;
+  leisureInterval: number; // Leisure tag reminder interval (minutes)
+  leisureMessageMode: 'random' | 'custom';
+  leisureCustomMessage: string;
 }
 
 export interface DayStats {

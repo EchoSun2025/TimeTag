@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { Tag, RecurringSchedule } from '@/types';
+import ReminderSettings from './ReminderSettings';
 
 interface SettingsPageProps {
   isOpen: boolean;
@@ -304,6 +305,7 @@ const MemoizedTagEditor = React.memo(TagEditor, arePropsEqual);
 function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const tags = useLiveQuery(() => db.tags.toArray(), []);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+  const [activeTab, setActiveTab] = useState<'tags' | 'reminders'>('tags');
   const [editName, setEditName] = useState('');
   const [editIsLeisure, setEditIsLeisure] = useState(false);
   const [editColor, setEditColor] = useState(TAG_COLORS[0]);
@@ -429,99 +431,136 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       {/* Modal */}
       <div 
         ref={modalRef}
-        className="relative bg-white rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col"
+        className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col"
+        style={{ color: 'var(--text-primary)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-2xl font-semibold">Settings - Tag Management</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
+          <h2 className="text-2xl font-semibold">Settings</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
           >
             ×
           </button>
         </div>
 
-        {/* Body - Split view */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Left side - Tag list */}
-          <div className="w-1/3 border-r border-gray-200 overflow-y-auto p-4">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Tags</h3>
-            <div className="space-y-2">
-              {tags?.map((tag) => (
-                <button
-                  key={tag.id}
-                  onClick={() => handleTagSelect(tag)}
-                  className={`w-full text-left px-3 py-2 rounded transition-all ${
-                    selectedTag?.id === tag.id
-                      ? 'bg-blue-50 border-2 border-blue-500'
-                      : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div 
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: tag.color }}
-                    />
-                    <span className="font-medium">{tag.name}</span>
-                    {tag.isLeisure && (
-                      <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">
-                        Leisure
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1 space-x-2">
-                    {tag.subItems && tag.subItems.length > 0 && (
-                      <span>{tag.subItems.length} sub-items</span>
-                    )}
-                    {tag.recurringSchedules && tag.recurringSchedules.length > 0 && (
-                      <span>• {tag.recurringSchedules.length} schedules</span>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* Tabs */}
+        <div className="flex border-b" style={{ borderColor: 'var(--border-color)' }}>
+          <button
+            onClick={() => setActiveTab('tags')}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === 'tags'
+                ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            }`}
+          >
+            Tag Management
+          </button>
+          <button
+            onClick={() => setActiveTab('reminders')}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === 'reminders'
+                ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            }`}
+          >
+            Reminder Settings
+          </button>
+        </div>
 
-          {/* Right side - Tag editor */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {selectedTag ? (
-              <MemoizedTagEditor
-                selectedTagId={selectedTag.id}
-                editName={editName}
-                setEditName={setEditName}
-                editIsLeisure={editIsLeisure}
-                setEditIsLeisure={setEditIsLeisure}
-                editColor={editColor}
-                setEditColor={setEditColor}
-                editSubItems={editSubItems}
-                setEditSubItems={setEditSubItems}
-                editSchedules={editSchedules}
-                setEditSchedules={setEditSchedules}
-                handleAddSchedule={handleAddSchedule}
-                handleRemoveSchedule={handleRemoveSchedule}
-                handleScheduleChange={handleScheduleChange}
-                handleSave={handleSave}
-                handleCancel={handleCancel}
-                handleDelete={handleDelete}
-                dayNames={dayNames}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">←</div>
-                  <div>Select a tag to edit</div>
+        {/* Content */}
+        {activeTab === 'tags' ? (
+          <>
+            {/* Body - Split view */}
+            <div className="flex-1 flex overflow-hidden">
+              {/* Left side - Tag list */}
+              <div className="w-1/3 border-r overflow-y-auto p-4" style={{ borderColor: 'var(--border-color)' }}>
+                <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>Tags</h3>
+                <div className="space-y-2">
+                  {tags?.map((tag) => (
+                    <button
+                      key={tag.id}
+                      onClick={() => handleTagSelect(tag)}
+                      className={`w-full text-left px-3 py-2 rounded transition-all ${
+                        selectedTag?.id === tag.id
+                          ? 'bg-blue-50 dark:bg-blue-900/50 border-2 border-blue-500'
+                          : 'bg-gray-50 dark:bg-gray-800 border-2 border-transparent hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: tag.color }}
+                        />
+                        <span className="font-medium">{tag.name}</span>
+                        {tag.isLeisure && (
+                          <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-1.5 py-0.5 rounded">
+                            Leisure
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs mt-1 space-x-2" style={{ color: 'var(--text-muted)' }}>
+                        {tag.subItems && tag.subItems.length > 0 && (
+                          <span>{tag.subItems.length} sub-items</span>
+                        )}
+                        {tag.recurringSchedules && tag.recurringSchedules.length > 0 && (
+                          <span>• {tag.recurringSchedules.length} schedules</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* Footer hint */}
-        <div className="px-6 py-3 border-t border-gray-200 bg-gray-50 text-xs text-gray-600">
-          <strong>Tip:</strong> Fixed schedules automatically create time blocks. 
-          Example: "Meal" on Monday-Friday 12:00-13:00 will appear on timeline every weekday at noon.
-        </div>
+              {/* Right side - Tag editor */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {selectedTag ? (
+                  <MemoizedTagEditor
+                    selectedTagId={selectedTag.id}
+                    editName={editName}
+                    setEditName={setEditName}
+                    editIsLeisure={editIsLeisure}
+                    setEditIsLeisure={setEditIsLeisure}
+                    editColor={editColor}
+                    setEditColor={setEditColor}
+                    editSubItems={editSubItems}
+                    setEditSubItems={setEditSubItems}
+                    editSchedules={editSchedules}
+                    setEditSchedules={setEditSchedules}
+                    handleAddSchedule={handleAddSchedule}
+                    handleRemoveSchedule={handleRemoveSchedule}
+                    handleScheduleChange={handleScheduleChange}
+                    handleSave={handleSave}
+                    handleCancel={handleCancel}
+                    handleDelete={handleDelete}
+                    dayNames={dayNames}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full" style={{ color: 'var(--text-muted)' }}>
+                    <div className="text-center">
+                      <div className="text-4xl mb-2">←</div>
+                      <div>Select a tag to edit</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer hint */}
+            <div className="px-6 py-3 border-t text-xs" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
+              <strong>Tip:</strong> Fixed schedules automatically create time blocks. 
+              Example: "Meal" on Monday-Friday 12:00-13:00 will appear on timeline every weekday at noon.
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Reminder Settings Content */}
+            <div className="flex-1 overflow-y-auto">
+              <ReminderSettings />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
