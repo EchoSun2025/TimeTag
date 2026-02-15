@@ -253,6 +253,19 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const [editIsLeisure, setEditIsLeisure] = useState(false);
   const [editSubItems, setEditSubItems] = useState('');
   const [editSchedules, setEditSchedules] = useState<RecurringSchedule[]>([]);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+
+  // Force focus when modal opens
+  React.useEffect(() => {
+    if (isOpen && modalRef.current) {
+      // Simulate a click on the modal to activate the window
+      setTimeout(() => {
+        if (modalRef.current) {
+          modalRef.current.click();
+        }
+      }, 10);
+    }
+  }, [isOpen]);
 
   const handleTagSelect = React.useCallback((tag: Tag) => {
     // If clicking the same tag, don't reset states (prevents losing focus)
@@ -341,7 +354,10 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col">
+      <div 
+        ref={modalRef}
+        className="relative bg-white rounded-lg shadow-xl w-full max-w-5xl mx-4 h-[80vh] flex flex-col"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-2xl font-semibold">Settings - Tag Management</h2>
