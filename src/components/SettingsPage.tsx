@@ -17,19 +17,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const [editIsLeisure, setEditIsLeisure] = useState(false);
   const [editSubItems, setEditSubItems] = useState('');
   const [editSchedules, setEditSchedules] = useState<RecurringSchedule[]>([]);
-  const justSavedRef = React.useRef(false); // Track if we just saved
-
-  // Auto-update selectedTag only after a save operation
-  React.useEffect(() => {
-    if (justSavedRef.current && selectedTag && tags) {
-      const updatedTag = tags.find(t => t.id === selectedTag.id);
-      if (updatedTag) {
-        // Update only the reference, don't reset edit states
-        setSelectedTag(updatedTag);
-      }
-      justSavedRef.current = false; // Reset flag
-    }
-  }, [tags]);
 
   const handleTagSelect = (tag: Tag) => {
     setSelectedTag(tag);
@@ -60,10 +47,8 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       updateData.color = LEISURE_GREEN;
     }
 
-    justSavedRef.current = true; // Mark that we're saving
     await db.tags.update(selectedTag.id, updateData);
-    
-    // Note: useEffect will update selectedTag reference when tags updates
+    // Don't update any local state - keep everything as is to maintain focus
   };
 
   const handleCancel = () => {
@@ -168,14 +153,13 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
           {/* Right side - Tag editor */}
           <div className="flex-1 overflow-y-auto p-6">
             {selectedTag ? (
-              <div key={selectedTag.id} className="space-y-6">
+              <div className="space-y-6">
                 {/* Tag Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Tag Name
                   </label>
                   <input
-                    key={`name-${selectedTag.id}`}
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
@@ -187,7 +171,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                 <div>
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
-                      key={`leisure-${selectedTag.id}`}
                       type="checkbox"
                       checked={editIsLeisure}
                       onChange={(e) => setEditIsLeisure(e.target.checked)}
@@ -211,7 +194,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                     </span>
                   </label>
                   <textarea
-                    key={`subitems-${selectedTag.id}`}
                     value={editSubItems}
                     onChange={(e) => setEditSubItems(e.target.value)}
                     placeholder="e.g., for 'Work' tag:&#10;Can's work&#10;FX work&#10;Art work"
@@ -239,7 +221,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
 
                   <div className="space-y-3">
                     {editSchedules.map((schedule, index) => (
-                      <div key={`${selectedTag.id}-schedule-${index}`} className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                      <div key={index} className="border border-gray-200 rounded-md p-3 bg-gray-50">
                         <div className="flex items-center gap-2 mb-2">
                           <select
                             value={schedule.dayOfWeek}
@@ -252,7 +234,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                           </select>
 
                           <input
-                            key={`${selectedTag.id}-sh-${index}`}
                             type="number"
                             min="0"
                             max="23"
@@ -262,7 +243,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                           />
                           <span>:</span>
                           <input
-                            key={`${selectedTag.id}-sm-${index}`}
                             type="number"
                             min="0"
                             max="59"
@@ -274,7 +254,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                           <span className="text-gray-500">to</span>
 
                           <input
-                            key={`${selectedTag.id}-eh-${index}`}
                             type="number"
                             min="0"
                             max="23"
@@ -284,7 +263,6 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                           />
                           <span>:</span>
                           <input
-                            key={`${selectedTag.id}-em-${index}`}
                             type="number"
                             min="0"
                             max="59"
