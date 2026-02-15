@@ -72,7 +72,7 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
 
   const handleTagToggle = (tagId: string) => {
     setSelectedTags([tagId]); // Only one tag at a time
-    setFocusedTagIndex(-1);
+    // Don't reset focusedTagIndex, keep current focus position
   };
 
   const handleSave = async () => {
@@ -126,6 +126,13 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       // Arrow up/down/left/right: navigate tags (2D grid)
       if (e.key === 'ArrowDown') {
         e.preventDefault();
+        
+        // Handle case when no tag is focused yet
+        if (focusedTagIndex === -1) {
+          setFocusedTagIndex(0);
+          return;
+        }
+        
         // Move down to next row (±9 for 9-column layout)
         const nextIndex = focusedTagIndex + TAGS_PER_ROW;
         if (nextIndex < tags.length) {
@@ -146,6 +153,13 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
         }
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
+        
+        // Handle case when no tag is focused yet
+        if (focusedTagIndex === -1) {
+          setFocusedTagIndex(0);
+          return;
+        }
+        
         // Move up to previous row
         const prevIndex = focusedTagIndex - TAGS_PER_ROW;
         if (prevIndex >= 0) {
@@ -268,7 +282,14 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
               {tags?.map((tag, index) => (
                 <button
                   key={tag.id}
-                  onClick={() => handleTagToggle(tag.id)}
+                  onClick={() => {
+                    handleTagToggle(tag.id);
+                    setFocusedTagIndex(index);
+                    // Ensure focus returns to tags container
+                    setTimeout(() => {
+                      tagsContainerRef.current?.focus();
+                    }, 0);
+                  }}
                   className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
                     selectedTags.includes(tag.id)
                       ? 'text-white ring-2 ring-offset-2'
