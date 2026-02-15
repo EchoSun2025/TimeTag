@@ -34,8 +34,11 @@ function MiniWindow() {
   if (!activeRecord) {
     return (
       <div 
-        className="w-full h-full flex items-center justify-center bg-gray-900/95 text-white rounded-lg shadow-2xl backdrop-blur-sm"
-        style={{ WebkitAppRegion: 'drag' } as any}
+        className="w-full h-full flex items-center justify-center text-white rounded-2xl shadow-2xl"
+        style={{ 
+          WebkitAppRegion: 'drag',
+          backgroundColor: '#1a1a24'
+        } as any}
       >
         <div className="text-center text-sm opacity-70">
           No active recording
@@ -57,8 +60,13 @@ function MiniWindow() {
 
   return (
     <div 
-      className="w-full h-full flex items-center bg-gray-900/95 text-white rounded-lg shadow-2xl backdrop-blur-sm px-3 gap-2"
-      style={{ WebkitAppRegion: 'drag', paddingTop: '7px', paddingBottom: '7px' } as any}
+      className="w-full h-full flex items-center text-white rounded-2xl shadow-2xl px-3 gap-2"
+      style={{ 
+        WebkitAppRegion: 'drag', 
+        paddingTop: '7px', 
+        paddingBottom: '7px',
+        backgroundColor: '#1a1a24'
+      } as any}
     >
       {/* Timer - 0.7x size, teal color */}
       <div 
