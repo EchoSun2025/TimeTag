@@ -57,7 +57,7 @@ function MiniWindow() {
 
   return (
     <div 
-      className="w-full h-full flex items-center bg-gray-900/95 text-white rounded-lg shadow-2xl backdrop-blur-sm px-3 gap-2"
+      className="w-full h-full flex items-center bg-gray-900/95 text-white rounded-lg shadow-2xl backdrop-blur-sm px-3 py-3 gap-2"
       style={{ WebkitAppRegion: 'drag' } as any}
     >
       {/* Timer - 0.7x size, teal color */}
