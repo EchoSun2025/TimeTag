@@ -48,12 +48,25 @@ const TagEditor = React.memo(({
   
   // Auto-focus on name input when editor opens
   const nameInputRef = React.useRef<HTMLInputElement>(null);
+  
   React.useEffect(() => {
     console.log('🎯 TagEditor mounted/updated, attempting to focus', { selectedTagId });
-    if (nameInputRef.current) {
-      nameInputRef.current.focus();
-      console.log('✅ Focus set on name input');
-    }
+    
+    // Delay focus to ensure DOM is fully rendered
+    const timeoutId = setTimeout(() => {
+      if (nameInputRef.current) {
+        nameInputRef.current.focus();
+        console.log('✅ Focus set on name input', {
+          hasFocus: document.activeElement === nameInputRef.current,
+          activeElement: document.activeElement?.tagName,
+          activeElementClass: document.activeElement?.className
+        });
+      } else {
+        console.log('❌ nameInputRef.current is null');
+      }
+    }, 0);
+    
+    return () => clearTimeout(timeoutId);
   }, [selectedTagId]); // Re-focus when tag changes
   
   return (
@@ -68,6 +81,8 @@ const TagEditor = React.memo(({
           type="text"
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
+          onFocus={() => console.log('📌 Name input received focus')}
+          onBlur={() => console.log('📌 Name input lost focus')}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
