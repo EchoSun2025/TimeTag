@@ -8,7 +8,7 @@ import SettingsPage from './SettingsPage';
 function TopBar() {
   const [isRounding, setIsRounding] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { activeRecord, stopRecording, startRecording, currentDate, isDarkMode, setDarkMode } = useAppStore();
+  const { activeRecord, stopRecording, startRecording, currentDate, isDarkMode, setDarkMode, updateSettings } = useAppStore();
   
   // Get today's records to find the most recent one
   const todayRecords = useLiveQuery(async () => {
@@ -99,8 +99,8 @@ function TopBar() {
       }
     }
 
-    // Update settings
-    await db.settings.update(1, { timeRounding: newState });
+    // Update settings in both database and appStore
+    await updateSettings({ timeRounding: newState });
     console.log('⚙️ Updated settings: timeRounding =', newState);
   };
 
