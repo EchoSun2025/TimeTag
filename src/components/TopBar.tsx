@@ -44,38 +44,61 @@ function TopBar() {
     if (newState) {
       // Turning ON: Apply rounding and save original times
       const allRecords = await db.records.toArray();
+      console.log('🔄 Enabling 15min round for', allRecords.length, 'records');
       
       for (const record of allRecords) {
-        const roundedStart = roundTime(new Date(record.startTime), 15);
-        const roundedEnd = roundTime(new Date(record.endTime), 15);
+        const currentStart = new Date(record.startTime);
+        const currentEnd = new Date(record.endTime);
+        const roundedStart = roundTime(currentStart, 15);
+        const roundedEnd = roundTime(currentEnd, 15);
         
-        await db.records.update(record.id, {
+        // Only save original times if not already saved
+        const updates: any = {
           startTime: roundedStart,
           endTime: roundedEnd,
-          // Save original times if not already saved
-          originalStartTime: record.originalStartTime || record.startTime,
-          originalEndTime: record.originalEndTime || record.endTime,
           updatedAt: new Date(),
-        });
+        };
+        
+        // Save original times only if they don't exist yet
+        if (!record.originalStartTime || !record.originalEndTime) {
+          updates.originalStartTime = currentStart;
+          updates.originalEndTime = currentEnd;
+          console.log('💾 Saving original times for record:', record.id, {
+            original: { start: currentStart, end: currentEnd },
+            rounded: { start: roundedStart, end: roundedEnd }
+          });
+        } else {
+          console.log('✓ Original times already saved for record:', record.id);
+        }
+        
+        await db.records.update(record.id, updates);
       }
     } else {
       // Turning OFF: Restore original times
       const allRecords = await db.records.toArray();
+      console.log('🔙 Disabling 15min round, restoring', allRecords.length, 'records');
       
       for (const record of allRecords) {
         // Restore from original times if available
         if (record.originalStartTime && record.originalEndTime) {
           await db.records.update(record.id, {
-            startTime: record.originalStartTime,
-            endTime: record.originalEndTime,
+            startTime: new Date(record.originalStartTime),
+            endTime: new Date(record.originalEndTime),
             updatedAt: new Date(),
           });
+          console.log('✅ Restored record:', record.id, {
+            from: { start: record.startTime, end: record.endTime },
+            to: { start: record.originalStartTime, end: record.originalEndTime }
+          });
+        } else {
+          console.log('⚠️ No original times found for record:', record.id);
         }
       }
     }
 
     // Update settings
     await db.settings.update(1, { timeRounding: newState });
+    console.log('⚙️ Updated settings: timeRounding =', newState);
   };
 
   const handleContinue = () => {
