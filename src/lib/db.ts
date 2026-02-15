@@ -38,15 +38,15 @@ export async function initializeDefaultTags() {
   const existingTags = await db.tags.toArray();
   if (existingTags.length === 0) {
     const defaultTags: Omit<Tag, 'id'>[] = [
-      { name: 'Work', color: '#4285F4', isActive: true, createdAt: new Date() },
-      { name: 'Study', color: '#34A853', isActive: true, createdAt: new Date() },
-      { name: 'Meeting', color: '#EA4335', isActive: true, createdAt: new Date() },
-      { name: 'Break', color: '#FBBC04', isActive: true, createdAt: new Date() },
-      { name: 'Exercise', color: '#00ACC1', isActive: true, createdAt: new Date() },
-      { name: 'Reading', color: '#A142F4', isActive: true, createdAt: new Date() },
-      { name: 'Meal', color: '#F9AB00', isActive: true, createdAt: new Date() },
-      { name: 'Social', color: '#E91E63', isActive: true, createdAt: new Date() },
-      { name: 'Other', color: '#5E6FE1', isActive: true, createdAt: new Date() },
+      { name: 'Work', color: '#4285F4', isActive: true, isLeisure: false, subItems: [], createdAt: new Date() },
+      { name: 'Study', color: '#34A853', isActive: true, isLeisure: false, subItems: [], createdAt: new Date() },
+      { name: 'Meeting', color: '#EA4335', isActive: true, isLeisure: false, subItems: [], createdAt: new Date() },
+      { name: 'Break', color: '#FBBC04', isActive: true, isLeisure: true, subItems: [], createdAt: new Date() },
+      { name: 'Exercise', color: '#00ACC1', isActive: true, isLeisure: true, subItems: [], createdAt: new Date() },
+      { name: 'Reading', color: '#A142F4', isActive: true, isLeisure: false, subItems: [], createdAt: new Date() },
+      { name: 'Meal', color: '#F9AB00', isActive: true, isLeisure: true, subItems: [], createdAt: new Date() },
+      { name: 'Social', color: '#E91E63', isActive: true, isLeisure: true, subItems: [], createdAt: new Date() },
+      { name: 'Other', color: '#5E6FE1', isActive: true, isLeisure: false, subItems: [], createdAt: new Date() },
     ];
 
     for (const tag of defaultTags) {

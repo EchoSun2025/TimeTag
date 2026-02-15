@@ -20,12 +20,13 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
   const [isDragging, setIsDragging] = useState(false);
   const [dragMode, setDragMode] = useState<DragMode>('none');
   const [showDelete, setShowDelete] = useState(false);
+  const [showContinue, setShowContinue] = useState(false);
   const dragStartY = useRef(0);
   const initialStartTime = useRef(0);
   const initialEndTime = useRef(0);
   const hasDragged = useRef(false);
   
-  const { settings } = useAppStore();
+  const { settings, startRecording } = useAppStore();
 
   const startTime = new Date(record.startTime).getTime();
   const endTime = new Date(record.endTime).getTime();
@@ -139,6 +140,13 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
       await db.records.delete(record.id);
     }
   };
+
+  const handleContinue = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Start new recording with same description and tags
+    startRecording(record.description, record.tags);
+  };
   
   return (
     <div
@@ -169,8 +177,14 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
         }}
         onMouseDown={(e) => handleMouseDown(e, 'move')}
         onDoubleClick={handleDoubleClick}
-        onMouseEnter={() => setShowDelete(true)}
-        onMouseLeave={() => setShowDelete(false)}
+        onMouseEnter={() => {
+          setShowDelete(true);
+          setShowContinue(true);
+        }}
+        onMouseLeave={() => {
+          setShowDelete(false);
+          setShowContinue(false);
+        }}
       >
         {/* Delete button - top right corner */}
         {showDelete && !isDragging && (
@@ -181,6 +195,18 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
             title="Delete record"
           >
             ×
+          </button>
+        )}
+
+        {/* Continue button - top left corner */}
+        {showContinue && !isDragging && (
+          <button
+            onClick={handleContinue}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white rounded-full text-xs font-bold z-30 shadow-md pointer-events-auto"
+            title="Continue this activity"
+          >
+            ▶
           </button>
         )}
 

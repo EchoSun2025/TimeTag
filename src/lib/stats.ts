@@ -14,6 +14,9 @@ export function calculateDayStats(
   // Filter only active tags
   const activeTags = tags.filter(t => t.isActive);
   const activeTagIds = new Set(activeTags.map(t => t.id));
+  
+  // Get leisure tag IDs
+  const leisureTagIds = new Set(tags.filter(t => t.isLeisure).map(t => t.id));
 
   // Calculate total minutes and tag breakdown
   let totalMinutes = 0;
@@ -26,9 +29,15 @@ export function calculateDayStats(
 
     // Check if record has any active tags
     const hasActiveTags = record.tags.some(tagId => activeTagIds.has(tagId));
+    
+    // Check if record is leisure (any tag is leisure)
+    const isLeisure = record.tags.some(tagId => leisureTagIds.has(tagId));
 
     if (hasActiveTags || record.tags.length === 0) {
-      totalMinutes += duration;
+      // Only count in total if not leisure
+      if (!isLeisure) {
+        totalMinutes += duration;
+      }
 
       // Count for each tag
       record.tags.forEach(tagId => {

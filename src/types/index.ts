@@ -10,11 +10,20 @@ export interface TimeRecord {
   updatedAt: Date;
 }
 
+export interface ActiveRecord {
+  id: string;
+  description: string;
+  startTime: Date;
+  tags: string[];
+}
+
 export interface Tag {
   id: string;
   name: string;
   color: string;
   isActive: boolean; // For filtering (gray out when inactive)
+  isLeisure: boolean; // Leisure tags don't count in total hours
+  subItems: string[]; // Sub-items list for quick selection
   createdAt: Date;
 }
 

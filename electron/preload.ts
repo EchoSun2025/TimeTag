@@ -12,6 +12,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onToggleRecording: (callback: () => void) => {
     ipcRenderer.on('shortcut:toggle-recording', callback);
   },
+  onToggleView: (callback: () => void) => {
+    ipcRenderer.on('shortcut:toggle-view', callback);
+  },
 
   // Remove listeners
   removeAllListeners: (channel: string) => {
@@ -25,6 +28,7 @@ export interface ElectronAPI {
   restoreFromMini: () => Promise<void>;
   closeWindow: () => Promise<void>;
   onToggleRecording: (callback: () => void) => void;
+  onToggleView: (callback: () => void) => void;
   removeAllListeners: (channel: string) => void;
 }
 

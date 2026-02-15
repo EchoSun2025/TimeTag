@@ -69,6 +69,19 @@ function registerGlobalShortcuts() {
     if (mainWindow) {
       mainWindow.webContents.send('shortcut:toggle-recording');
     }
+    if (miniWindow) {
+      miniWindow.webContents.send('shortcut:toggle-recording');
+    }
+  });
+
+  // Alt+A to toggle between full and mini view
+  globalShortcut.register('Alt+A', () => {
+    if (mainWindow) {
+      mainWindow.webContents.send('shortcut:toggle-view');
+    }
+    if (miniWindow) {
+      miniWindow.webContents.send('shortcut:toggle-view');
+    }
   });
 }
 

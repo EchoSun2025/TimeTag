@@ -10,12 +10,11 @@ import MiniWindow from '@/components/MiniWindow';
 import RecordModal from '@/components/RecordModal';
 
 function App() {
-  const { loadSettings, currentDate } = useAppStore();
-  const [isQuickRecordOpen, setIsQuickRecordOpen] = useState(false);
-  const [quickRecordStart, setQuickRecordStart] = useState<Date | undefined>();
+  const { loadSettings, startRecording, stopRecording, activeRecord, isMiniMode, setMiniMode } = useAppStore();
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   
   // Check if we're in mini mode from URL hash
-  const isMiniMode = window.location.hash === '#/mini';
+  const urlIsMiniMode = window.location.hash === '#/mini';
 
   useEffect(() => {
     // Initialize database and load settings
@@ -25,17 +24,28 @@ function App() {
     };
     init();
 
-    // Register Alt+X shortcut listener
+    // Register keyboard shortcuts
     if (window.electronAPI) {
+      // Alt+X: Stop recording if active, otherwise open new record modal
       window.electronAPI.onToggleRecording(() => {
-        if (!isQuickRecordOpen) {
-          // Open modal with current time as start
-          const now = new Date();
-          setQuickRecordStart(now);
-          setIsQuickRecordOpen(true);
+        if (activeRecord) {
+          stopRecording();
         } else {
-          // Close modal
-          setIsQuickRecordOpen(false);
+          setIsRecordModalOpen(true);
+        }
+      });
+
+      // Alt+A: Toggle between full view and mini view
+      window.electronAPI.onToggleView(() => {
+        if (activeRecord) {
+          // If recording, toggle between views without stopping
+          if (isMiniMode) {
+            setMiniMode(false);
+            window.electronAPI.restoreFromMini();
+          } else {
+            setMiniMode(true);
+            window.electronAPI.minimizeToMini();
+          }
         }
       });
     }
@@ -43,17 +53,20 @@ function App() {
     return () => {
       if (window.electronAPI) {
         window.electronAPI.removeAllListeners('shortcut:toggle-recording');
+        window.electronAPI.removeAllListeners('shortcut:toggle-view');
       }
     };
-  }, [loadSettings, isQuickRecordOpen]);
+  }, [loadSettings, activeRecord, stopRecording, isMiniMode, setMiniMode]);
 
   // Render mini window if in mini mode
-  if (isMiniMode) {
+  if (urlIsMiniMode || isMiniMode) {
     return <MiniWindow />;
   }
 
-  // Calculate end time for quick record (1 hour from start)
-  const quickRecordEnd = quickRecordStart ? new Date(quickRecordStart.getTime() + 60 * 60 * 1000) : undefined;
+  const handleStartRecording = (description: string, tags: string[]) => {
+    startRecording(description, tags);
+    setIsRecordModalOpen(false);
+  };
 
   return (
     <div className="flex flex-col h-screen bg-white text-black overflow-hidden">
@@ -86,15 +99,11 @@ function App() {
         </div>
       </div>
 
-      {/* Quick Record Modal (Alt+X) */}
+      {/* New Record Modal */}
       <RecordModal
-        isOpen={isQuickRecordOpen}
-        onClose={() => {
-          setIsQuickRecordOpen(false);
-          setQuickRecordStart(undefined);
-        }}
-        initialStartTime={quickRecordStart}
-        initialEndTime={quickRecordEnd}
+        isOpen={isRecordModalOpen}
+        onClose={() => setIsRecordModalOpen(false)}
+        onStartRecording={handleStartRecording}
       />
     </div>
   );
