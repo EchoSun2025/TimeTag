@@ -114,22 +114,26 @@ function MonthView({ currentDate }: MonthViewProps) {
     <div className="flex flex-col h-full">
       {/* Month total card */}
       <div className="mb-6">
-        <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-4 flex items-center gap-6">
+        <div className="rounded-lg p-4 flex items-center gap-6" style={{
+          backgroundColor: 'var(--accent-bg)',
+          borderWidth: '1px',
+          borderColor: 'var(--accent-border)'
+        }}>
           <div>
-            <div className="text-sm text-gray-600 mb-1">Month Total</div>
-            <div className="text-3xl font-semibold">{monthTotalTime.hours}h {monthTotalTime.minutes}m</div>
+            <div className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Month Total</div>
+            <div className="text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>{monthTotalTime.hours}h {monthTotalTime.minutes}m</div>
           </div>
           
           {/* Tag breakdown inline */}
           {monthTagBreakdown.length > 0 && (
-            <div className="flex items-center gap-4 border-l border-gray-300 pl-6">
+            <div className="flex items-center gap-4 pl-6" style={{ borderLeft: `1px solid var(--border-color)` }}>
               {monthTagBreakdown.slice(0, 5).map((tag) => (
                 <div key={tag.name} className="flex items-center gap-2">
                   <div 
                     className="w-3 h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: tag.color }}
                   />
-                  <span className="font-mono text-base">{tag.hours}h {tag.minutes}m</span>
+                  <span className="font-mono text-base" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
                 </div>
               ))}
             </div>
@@ -142,7 +146,7 @@ function MonthView({ currentDate }: MonthViewProps) {
         {/* Weekday headers */}
         <div className="grid grid-cols-7 gap-2 mb-2">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-            <div key={day} className="text-center text-sm font-medium text-gray-600">
+            <div key={day} className="text-center text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
               {day}
             </div>
           ))}

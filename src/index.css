@@ -14,10 +14,11 @@
     --text-muted: #9ca3af;
     --border-color: #d1d5db;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --accent-bg: #fef3c7;  /* Light yellow for cards */
-    --accent-border: #fde68a;
-    --timeline-bg: #fef9c3;  /* Light yellow for timeline */
+    --accent-bg: #fffbeb;  /* Very light yellow - bg-yellow-50 */
+    --accent-border: #fef3c7;  /* Light yellow border */
+    --timeline-bg: #fffbeb;  /* Very light yellow for timeline */
     --timeline-grid: #e5e7eb;  /* Light gray for grid lines */
+    --button-bg: #ffffff;  /* White for buttons */
   }
 
   /* Dark mode - based on TimeRecord v1 with deep blue accent */
@@ -31,10 +32,11 @@
     --text-muted: #71717a;  /* Brighter in dark mode */
     --border-color: #27272a;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --accent-bg: #1e3a5f;  /* Deep blue instead of yellow */
-    --accent-border: #2a4a70;
-    --timeline-bg: #2a4a6f;  /* Lighter blue for timeline */
-    --timeline-grid: #1a2a3f;  /* Darker for grid lines */
+    --accent-bg: #0f1f2e;  /* Very dark blue, almost black */
+    --accent-border: #1a2a3f;
+    --timeline-bg: #0f1f2e;  /* Very dark blue for timeline */
+    --timeline-grid: #0a0a0f;  /* Even darker for grid lines */
+    --button-bg: #000000;  /* Black for buttons */
   }
 
   body {

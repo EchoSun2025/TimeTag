@@ -72,7 +72,7 @@ function TopBar() {
       borderBottom: `1px solid var(--border-color)`,
       backgroundColor: activeRecord 
         ? (document.documentElement.classList.contains('dark') ? 'rgba(34, 197, 94, 0.2)' : '#dcfce7')
-        : 'var(--accent-bg)'
+        : (document.documentElement.classList.contains('dark') ? '#1a1a24' : '#f9fafb')
     }}>
       {/* Left: Title */}
       <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>TimeTag</h1>
