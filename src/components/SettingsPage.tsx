@@ -18,8 +18,8 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const handleTagSelect = (tag: Tag) => {
     setSelectedTag(tag);
     setEditName(tag.name);
-    setEditIsLeisure(tag.isLeisure);
-    setEditSubItems(tag.subItems.join('\n'));
+    setEditIsLeisure(tag.isLeisure ?? false);
+    setEditSubItems((tag.subItems || []).join('\n'));
   };
 
   const handleSave = async () => {
@@ -94,7 +94,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                       </span>
                     )}
                   </div>
-                  {tag.subItems.length > 0 && (
+                  {tag.subItems && tag.subItems.length > 0 && (
                     <div className="text-xs text-gray-500 mt-1">
                       {tag.subItems.length} sub-items
                     </div>
