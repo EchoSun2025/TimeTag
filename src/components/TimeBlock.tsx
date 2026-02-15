@@ -41,7 +41,9 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
   const durationMinutes = endMinutes - startMinutes;
   
   const top = (startMinutes / 60) * heightPerHour;
-  const height = Math.max((durationMinutes / 60) * heightPerHour, 20); // Minimum 20px
+  // Force minimum 15 minutes display height for better button visibility
+  const displayDurationMinutes = Math.max(durationMinutes, 15);
+  const height = Math.max((displayDurationMinutes / 60) * heightPerHour, 20); // Minimum 20px
   
   // Get tag color
   const firstTag = record.tags.length > 0 
