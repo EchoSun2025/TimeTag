@@ -290,7 +290,7 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
                       tagsContainerRef.current?.focus();
                     }, 0);
                   }}
-                  className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                     selectedTags.includes(tag.id)
                       ? 'text-white ring-2 ring-offset-2'
                       : 'bg-gray-200 text-gray-600'

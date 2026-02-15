@@ -67,11 +67,27 @@ function Timeline() {
     return isSameDay(startTime, dateObj);
   }, [activeRecord, currentDate]);
 
-  // Calculate overlapping layout
+  // Build a virtual record for the active recording (if on current day)
+  const activeVirtualRecord: TimeRecord | null = useMemo(() => {
+    if (!activeRecordOnCurrentDay || !activeRecord) return null;
+    const startTime = activeRecord.startTime instanceof Date ? activeRecord.startTime : new Date(activeRecord.startTime);
+    return {
+      id: '__active__',
+      description: activeRecord.description,
+      startTime,
+      endTime: activeBlockNow,
+      tags: activeRecord.tags,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }, [activeRecordOnCurrentDay, activeRecord, activeBlockNow]);
+
+  // Calculate overlapping layout including the active virtual record
   const recordsWithLayout = useMemo(() => {
     if (!records) return [];
-    return calculateOverlappingLayout(records);
-  }, [records]);
+    const allRecords = activeVirtualRecord ? [...records, activeVirtualRecord] : records;
+    return calculateOverlappingLayout(allRecords);
+  }, [records, activeVirtualRecord]);
 
   const handleZoomIn = () => {
     if (timelineZoom >= 5 || !containerRef.current) return;
@@ -310,77 +326,81 @@ function Timeline() {
               onDoubleClick={handleDoubleClick}
             />
             
-            {/* Render time blocks with overlap support */}
-            {recordsWithLayout && tags && recordsWithLayout.map(record => (
-              <TimeBlock
-                key={record.id}
-                record={record}
-                tags={tags}
-                heightPerHour={heightPerHour}
-                dayStart={dayStartTimestamp}
-                onEdit={() => handleBlockEdit(record)}
-                column={record.column}
-                totalColumns={record.totalColumns}
-              />
-            ))}
+            {/* Render time blocks with overlap support (skip the virtual active record) */}
+            {recordsWithLayout && tags && recordsWithLayout.map(record => {
+              // Render active record placeholder separately
+              if (record.id === '__active__') {
+                const startTime = activeRecord!.startTime instanceof Date ? activeRecord!.startTime : new Date(activeRecord!.startTime);
+                const startMs = startTime.getTime();
+                const nowMs = activeBlockNow.getTime();
 
-            {/* Active record placeholder */}
-            {activeRecordOnCurrentDay && activeRecord && tags && (() => {
-              const startTime = activeRecord.startTime instanceof Date ? activeRecord.startTime : new Date(activeRecord.startTime);
-              const startMs = startTime.getTime();
-              const nowMs = activeBlockNow.getTime();
+                const startMinutes = (startMs - dayStartTimestamp) / (1000 * 60);
+                const durationMinutes = Math.max((nowMs - startMs) / (1000 * 60), 15);
+                const placeholderTop = (startMinutes / 60) * heightPerHour;
+                const placeholderHeight = Math.max((durationMinutes / 60) * heightPerHour, 20);
 
-              // Calculate position
-              const startMinutes = (startMs - dayStartTimestamp) / (1000 * 60);
-              const durationMinutes = Math.max((nowMs - startMs) / (1000 * 60), 15); // At least 15min display
-              const placeholderTop = (startMinutes / 60) * heightPerHour;
-              const placeholderHeight = Math.max((durationMinutes / 60) * heightPerHour, 20);
+                const tag = tags.find(t => t.id === activeRecord!.tags[0]);
+                const tagColor = tag?.color || '#4285F4';
+                const tagName = tag?.name || 'No Tag';
 
-              // Get tag info
-              const tag = tags.find(t => t.id === activeRecord.tags[0]);
-              const tagColor = tag?.color || '#4285F4';
-              const tagName = tag?.name || 'No Tag';
+                const columnWidth = 100 / record.totalColumns;
+                const leftPercent = record.column * columnWidth;
 
-              return (
-                <div
-                  className="absolute px-1"
-                  style={{
-                    top: `${placeholderTop}px`,
-                    height: `${placeholderHeight}px`,
-                    left: '0%',
-                    width: '100%',
-                    zIndex: 5,
-                  }}
-                >
+                return (
                   <div
-                    className="h-full rounded border-l-4 px-2 py-1 overflow-hidden animate-pulse"
+                    key="__active__"
+                    className="absolute px-1"
                     style={{
-                      backgroundColor: tagColor + '20',
-                      borderColor: tagColor,
-                      borderStyle: 'dashed',
-                      borderLeftStyle: 'solid',
+                      top: `${placeholderTop}px`,
+                      height: `${placeholderHeight}px`,
+                      left: `${leftPercent}%`,
+                      width: `${columnWidth}%`,
+                      zIndex: 5,
                     }}
                   >
-                    <div className="text-xs font-medium opacity-60">
-                      {formatTime(startTime)} - recording...
-                    </div>
-                    {placeholderHeight > 40 && (
-                      <div className="text-sm font-medium mt-1 opacity-70">
-                        {activeRecord.description || 'No description'}
+                    <div
+                      className="h-full rounded border-l-4 px-2 py-1 overflow-hidden animate-pulse"
+                      style={{
+                        backgroundColor: tagColor + '20',
+                        borderColor: tagColor,
+                        borderStyle: 'dashed',
+                        borderLeftStyle: 'solid',
+                      }}
+                    >
+                      <div className="text-xs font-medium opacity-60">
+                        {formatTime(startTime)} - recording...
                       </div>
-                    )}
-                    {placeholderHeight > 60 && tag && (
-                      <span
-                        className="inline-block text-xs px-1.5 py-0.5 rounded text-white mt-1 opacity-70"
-                        style={{ backgroundColor: tagColor }}
-                      >
-                        {tagName}
-                      </span>
-                    )}
+                      {placeholderHeight > 40 && (
+                        <div className="text-sm font-medium mt-1 opacity-70">
+                          {activeRecord!.description || 'No description'}
+                        </div>
+                      )}
+                      {placeholderHeight > 60 && tag && (
+                        <span
+                          className="inline-block text-xs px-1.5 py-0.5 rounded-full text-white mt-1 opacity-70"
+                          style={{ backgroundColor: tagColor }}
+                        >
+                          {tagName}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                );
+              }
+
+              return (
+                <TimeBlock
+                  key={record.id}
+                  record={record}
+                  tags={tags}
+                  heightPerHour={heightPerHour}
+                  dayStart={dayStartTimestamp}
+                  onEdit={() => handleBlockEdit(record)}
+                  column={record.column}
+                  totalColumns={record.totalColumns}
+                />
               );
-            })()}
+            })}
           </div>
         </div>
       </div>

@@ -129,7 +129,7 @@ function TagModal({ isOpen, onClose }: TagModalProps) {
             </label>
             <div className="flex items-center gap-2">
               <span
-                className="px-3 py-1.5 rounded text-sm font-medium text-white"
+                className="px-3 py-1.5 rounded-full text-sm font-medium text-white"
                 style={{ backgroundColor: selectedColor }}
               >
                 {tagName || 'Tag Name'}

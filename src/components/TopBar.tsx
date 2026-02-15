@@ -86,7 +86,7 @@ function TopBar() {
             {/* Tag - inline next to description */}
             {tag && (
               <span 
-                className="text-sm px-2.5 py-0.5 rounded text-white"
+                className="text-sm px-2.5 py-0.5 rounded-full text-white"
                 style={{ backgroundColor: tag.color }}
               >
                 {tag.name}

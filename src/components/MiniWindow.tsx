@@ -57,7 +57,7 @@ function MiniWindow() {
 
   return (
     <div 
-      className="w-full h-full flex items-center bg-gray-900/95 text-white rounded-lg shadow-2xl backdrop-blur-sm px-4 gap-3"
+      className="w-full h-full flex items-center bg-gray-900/95 text-white rounded-lg shadow-2xl backdrop-blur-sm px-3 gap-2"
       style={{ WebkitAppRegion: 'drag' } as any}
     >
       {/* Timer - 0.7x size, teal color */}
@@ -68,14 +68,18 @@ function MiniWindow() {
         {timeStr}
       </div>
 
-      {/* Description + Tag - stacked vertically, to the right of timer */}
-      <div className="flex-1 flex flex-col justify-center min-w-0 gap-0.5">
-        <div className="text-sm font-medium truncate opacity-90 leading-tight" title={activeRecord.description}>
+      {/* Description + Tag - stacked vertically, tight to timer */}
+      <div className="flex flex-col justify-center min-w-0 gap-0.5">
+        <div 
+          className="font-medium truncate opacity-90 leading-tight"
+          style={{ fontSize: '0.656rem' }}
+          title={activeRecord.description}
+        >
           {activeRecord.description || 'No description'}
         </div>
         <div 
-          className="self-start text-xs px-2 py-0.5 rounded text-white leading-tight"
-          style={{ backgroundColor: tagColor }}
+          className="self-start px-1.5 py-0.5 rounded-full text-white leading-tight"
+          style={{ backgroundColor: tagColor, fontSize: '0.563rem' }}
         >
           {tagName}
         </div>
@@ -85,7 +89,7 @@ function MiniWindow() {
       <button
         onClick={stopRecording}
         onMouseDown={(e) => e.stopPropagation()}
-        className="flex-shrink-0 bg-red-500 hover:bg-red-600 rounded flex items-center justify-center transition-colors shadow-lg"
+        className="flex-shrink-0 ml-auto bg-red-500 hover:bg-red-600 rounded flex items-center justify-center transition-colors shadow-lg"
         style={{ WebkitAppRegion: 'no-drag', width: '21px', height: '21px' } as any}
         title="Stop recording (Alt+X)"
       >

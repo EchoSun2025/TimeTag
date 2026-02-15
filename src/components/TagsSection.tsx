@@ -26,7 +26,7 @@ function TagsSection() {
             <button
               key={tag.id}
               onClick={() => handleTagToggle(tag.id)}
-              className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 tag.isActive
                   ? 'text-white'
                   : 'bg-gray-200 text-gray-400'
@@ -42,7 +42,7 @@ function TagsSection() {
           {/* Add tag button */}
           <button
             onClick={() => setIsTagModalOpen(true)}
-            className="px-3 py-1.5 rounded text-sm font-bold bg-gray-100 hover:bg-gray-200 text-gray-600 transition-all border border-dashed border-gray-300"
+            className="px-3 py-1.5 rounded-full text-sm font-bold bg-gray-100 hover:bg-gray-200 text-gray-600 transition-all border border-dashed border-gray-300"
             title="Add new tag"
           >
             + New Tag
