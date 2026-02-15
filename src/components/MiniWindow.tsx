@@ -8,12 +8,22 @@ function MiniWindow() {
   const [elapsed, setElapsed] = useState(0);
   const tags = useLiveQuery(() => db.tags.toArray(), []);
 
+  console.log('MiniWindow render:', { 
+    hasActiveRecord: !!activeRecord, 
+    activeRecordId: activeRecord?.id,
+    description: activeRecord?.description,
+    startTime: activeRecord?.startTime?.toISOString()
+  });
+
   // Update elapsed time every second
   useEffect(() => {
     if (!activeRecord) {
+      console.log('No active record, resetting elapsed to 0');
       setElapsed(0);
       return;
     }
+
+    console.log('Starting timer for active record:', activeRecord.id);
 
     // Initial calculation
     const now = new Date();
@@ -24,10 +34,15 @@ function MiniWindow() {
     const interval = setInterval(() => {
       const now = new Date();
       const diff = now.getTime() - activeRecord.startTime.getTime();
-      setElapsed(Math.floor(diff / 1000));
+      const seconds = Math.floor(diff / 1000);
+      console.log('Timer update:', seconds);
+      setElapsed(seconds);
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log('Cleaning up timer');
+      clearInterval(interval);
+    };
   }, [activeRecord]);
 
   if (!activeRecord) {
