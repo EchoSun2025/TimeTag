@@ -76,10 +76,12 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const handleScheduleChange = (
     index: number,
     field: keyof RecurringSchedule,
-    value: number
+    value: string | number
   ) => {
     const updated = [...editSchedules];
-    updated[index] = { ...updated[index], [field]: value };
+    // Handle both string and number inputs
+    const numValue = typeof value === 'string' ? (value === '' ? 0 : parseInt(value)) : value;
+    updated[index] = { ...updated[index], [field]: isNaN(numValue) ? 0 : numValue };
     setEditSchedules(updated);
   };
 
@@ -237,7 +239,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                             min="0"
                             max="23"
                             value={schedule.startHour}
-                            onChange={(e) => handleScheduleChange(index, 'startHour', parseInt(e.target.value))}
+                            onChange={(e) => handleScheduleChange(index, 'startHour', e.target.value)}
                             className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                           />
                           <span>:</span>
@@ -246,7 +248,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                             min="0"
                             max="59"
                             value={schedule.startMinute}
-                            onChange={(e) => handleScheduleChange(index, 'startMinute', parseInt(e.target.value))}
+                            onChange={(e) => handleScheduleChange(index, 'startMinute', e.target.value)}
                             className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                           />
 
@@ -257,7 +259,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                             min="0"
                             max="23"
                             value={schedule.endHour}
-                            onChange={(e) => handleScheduleChange(index, 'endHour', parseInt(e.target.value))}
+                            onChange={(e) => handleScheduleChange(index, 'endHour', e.target.value)}
                             className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                           />
                           <span>:</span>
@@ -266,7 +268,7 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                             min="0"
                             max="59"
                             value={schedule.endMinute}
-                            onChange={(e) => handleScheduleChange(index, 'endMinute', parseInt(e.target.value))}
+                            onChange={(e) => handleScheduleChange(index, 'endMinute', e.target.value)}
                             className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                           />
 
