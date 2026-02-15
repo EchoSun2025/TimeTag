@@ -6,6 +6,8 @@ import { TimeRecord } from '@/types';
 export function calculateOverlappingLayout(records: TimeRecord[]) {
   if (records.length === 0) return [];
 
+  console.log('calculateOverlappingLayout: input records', records.length);
+
   // Sort by start time
   const sorted = [...records].sort((a, b) => 
     new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
@@ -34,6 +36,12 @@ export function calculateOverlappingLayout(records: TimeRecord[]) {
       return !(otherEnd <= currentStart || otherStart >= currentEnd);
     });
 
+    console.log(`Record ${i} (${current.description}):`, {
+      start: new Date(current.startTime).toISOString(),
+      end: new Date(current.endTime).toISOString(),
+      overlappingCount: overlapping.length
+    });
+
     // Find used columns by overlapping records
     const usedColumns = overlapping
       .filter(r => r.column !== undefined)
@@ -49,6 +57,8 @@ export function calculateOverlappingLayout(records: TimeRecord[]) {
     // Calculate total columns needed for this overlapping group
     const maxColumn = Math.max(column, ...overlapping.map(r => r.column));
     current.totalColumns = maxColumn + 1;
+
+    console.log(`  Assigned column ${column}, totalColumns ${current.totalColumns}`);
   }
 
   // Second pass: ensure all overlapping records have same totalColumns
@@ -74,6 +84,14 @@ export function calculateOverlappingLayout(records: TimeRecord[]) {
       r.totalColumns = maxTotalColumns;
     });
   }
+
+  console.log('calculateOverlappingLayout: final layout', 
+    recordsWithLayout.map(r => ({
+      desc: r.description,
+      column: r.column,
+      totalColumns: r.totalColumns
+    }))
+  );
 
   return recordsWithLayout;
 }
