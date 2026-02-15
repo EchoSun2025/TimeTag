@@ -68,50 +68,52 @@ function TopBar() {
   };
 
   return (
-    <div className="border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+    <div className={`border-b border-gray-200 px-6 py-3 flex items-center justify-between transition-colors ${
+      activeRecord ? 'bg-green-50' : 'bg-gray-50'
+    }`}>
       {/* Left: Title */}
       <h1 className="text-2xl font-semibold">TimeTag</h1>
 
       {/* Center: Current/Last Record Display */}
       {displayRecord && (
         <div className="flex-1 mx-8 flex items-center justify-center">
-          <div className="bg-green-50 rounded-lg px-6 py-2 flex items-center gap-4 shadow-sm">
-            {/* Description and Tag */}
-            <div className="text-center">
-              <div className="text-sm font-medium text-gray-800">
-                {displayRecord.description || 'No description'}
-              </div>
-              {tag && (
-                <div 
-                  className="inline-block text-xs px-2 py-0.5 rounded text-white mt-1"
-                  style={{ backgroundColor: tag.color }}
-                >
-                  {tag.name}
-                </div>
-              )}
-            </div>
+          <div className="flex items-center gap-3">
+            {/* Description */}
+            <span className="text-base font-medium text-gray-800">
+              {displayRecord.description || 'No description'}
+            </span>
+
+            {/* Tag - inline next to description */}
+            {tag && (
+              <span 
+                className="text-sm px-2.5 py-0.5 rounded text-white"
+                style={{ backgroundColor: tag.color }}
+              >
+                {tag.name}
+              </span>
+            )}
 
             {/* Action Button */}
             {activeRecord ? (
               // Stop button (square) for active recording
               <button
                 onClick={stopRecording}
-                className="w-8 h-8 bg-red-500 hover:bg-red-600 rounded flex items-center justify-center transition-colors shadow"
+                className="w-7 h-7 bg-red-500 hover:bg-red-600 rounded flex items-center justify-center transition-colors shadow-sm ml-1"
                 title="Stop recording (Alt+X)"
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="white">
-                  <rect width="12" height="12" rx="1" />
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="white">
+                  <rect width="10" height="10" rx="1" />
                 </svg>
               </button>
             ) : (
               // Continue button (triangle) for completed record
               <button
                 onClick={handleContinue}
-                className="w-8 h-8 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center transition-colors shadow"
+                className="w-7 h-7 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center transition-colors shadow-sm ml-1"
                 title="Continue this activity"
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="white">
-                  <path d="M3 2 L3 10 L10 6 Z" />
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="white">
+                  <path d="M2.5 1.5 L2.5 8.5 L8.5 5 Z" />
                 </svg>
               </button>
             )}
