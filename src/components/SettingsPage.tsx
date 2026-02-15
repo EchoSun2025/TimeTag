@@ -17,17 +17,19 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const [editIsLeisure, setEditIsLeisure] = useState(false);
   const [editSubItems, setEditSubItems] = useState('');
   const [editSchedules, setEditSchedules] = useState<RecurringSchedule[]>([]);
+  const justSavedRef = React.useRef(false); // Track if we just saved
 
-  // Auto-update selectedTag when tags change (after save)
+  // Auto-update selectedTag only after a save operation
   React.useEffect(() => {
-    if (selectedTag && tags) {
+    if (justSavedRef.current && selectedTag && tags) {
       const updatedTag = tags.find(t => t.id === selectedTag.id);
-      if (updatedTag && JSON.stringify(updatedTag) !== JSON.stringify(selectedTag)) {
-        // Tag has been updated in database, update the reference but keep edit states
+      if (updatedTag) {
+        // Update only the reference, don't reset edit states
         setSelectedTag(updatedTag);
       }
+      justSavedRef.current = false; // Reset flag
     }
-  }, [tags, selectedTag]);
+  }, [tags]);
 
   const handleTagSelect = (tag: Tag) => {
     setSelectedTag(tag);
@@ -58,10 +60,10 @@ function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
       updateData.color = LEISURE_GREEN;
     }
 
+    justSavedRef.current = true; // Mark that we're saving
     await db.tags.update(selectedTag.id, updateData);
     
-    // Note: tags list will auto-update via useLiveQuery
-    // We keep selectedTag reference but don't manually reload to avoid losing focus
+    // Note: useEffect will update selectedTag reference when tags updates
   };
 
   const handleCancel = () => {
