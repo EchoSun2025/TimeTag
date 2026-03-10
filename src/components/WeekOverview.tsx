@@ -192,11 +192,12 @@ function WeekOverview() {
     <div className="flex flex-col h-full">
       {/* Week navigation and view mode buttons */}
       <div className="flex items-center gap-4 mb-4">
-        {/* Week date navigation with background card */}
+        {/* Week date navigation with background card - fixed width */}
         <div className="rounded-lg px-6 py-4 flex items-center gap-4" style={{
           backgroundColor: 'var(--accent-bg)',
           borderWidth: '1px',
-          borderColor: 'var(--accent-border)'
+          borderColor: 'var(--accent-border)',
+          minWidth: '420px'
         }}>
           <button
             onClick={handlePrevPeriod}
@@ -205,8 +206,11 @@ function WeekOverview() {
             &lt;
           </button>
           
-          <div className="text-xl font-sans font-bold">
-            {formatWeekRange(currentDate)}
+          <div className="text-xl font-sans font-bold flex-1 text-center">
+            {viewMode === 'month' 
+              ? `${format(currentDate, 'yyyy MMM')}`
+              : formatWeekRange(currentDate)
+            }
           </div>
           
           <button
@@ -303,9 +307,9 @@ function WeekOverview() {
                 const tag = tags.find(t => t.id === tagId);
                 if (!tag) return null;
                 const time = formatMinutesToHM(minutes);
-                return { color: tag.color, ...time };
+                return { name: tag.name, color: tag.color, ...time };
               })
-              .filter(Boolean) as Array<{ color: string; hours: number; minutes: number }>;
+              .filter(Boolean) as Array<{ name: string; color: string; hours: number; minutes: number }>;
 
             return (
               <div key={index} className="border rounded p-3 text-sm" style={{ borderColor: 'var(--border-color)' }}>
@@ -325,9 +329,9 @@ function WeekOverview() {
                       </div>
                     )}
 
-                    {/* Breaks */}
+                    {/* Breaks - same style as Total */}
                     {dayStats.breaks.map((brk, i) => (
-                      <div key={i} className="text-base mb-1 font-bold" style={{ color: 'var(--text-secondary)' }}>
+                      <div key={i} className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>
                         break {format(brk.startTime, 'h:mma').toLowerCase()}-{format(brk.endTime, 'h:mma').toLowerCase()}
                       </div>
                     ))}
@@ -339,7 +343,7 @@ function WeekOverview() {
                       </div>
                     )}
 
-                    {/* Tag breakdown with colored dots */}
+                    {/* Tag breakdown with colored dots and names */}
                     <div className="space-y-1 mb-3">
                       {dayTagBreakdown.map((tag, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm">
@@ -347,6 +351,7 @@ function WeekOverview() {
                             className="w-3 h-3 rounded-full flex-shrink-0"
                             style={{ backgroundColor: tag.color }}
                           />
+                          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{tag.name}</span>
                           <span className="font-mono" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
                         </div>
                       ))}
