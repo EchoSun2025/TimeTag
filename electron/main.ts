@@ -50,7 +50,7 @@ function createMiniWindow() {
   // If there are multiple displays, use the second one
   if (displays.length > 1) {
     // Find a display that's not the primary one
-    const secondaryDisplay = displays.find(d => !d.bounds.x === 0 && !d.bounds.y === 0) || displays[1];
+    const secondaryDisplay = displays.find((d: any) => d.bounds.x !== 0 || d.bounds.y !== 0) || displays[1];
     x = secondaryDisplay.bounds.x + 20;
     y = secondaryDisplay.bounds.y + 20;
   }
