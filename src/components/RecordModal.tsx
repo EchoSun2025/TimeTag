@@ -24,10 +24,19 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
   
   const descriptionRef = React.useRef<HTMLInputElement>(null);
   const tagsContainerRef = React.useRef<HTMLDivElement>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
 
   // Get selected tag's sub-items
   const selectedTag = tags?.find(t => selectedTags.includes(t.id));
   const subItems = selectedTag?.subItems || [];
+
+  // Focus modal when it opens
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      // Focus modal container to capture keyboard events
+      modalRef.current.focus();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (editRecord) {
@@ -280,7 +289,10 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       />
 
       {/* Modal */}
-      <div className="relative rounded-lg shadow-xl w-full max-w-2xl mx-4" 
+      <div 
+        ref={modalRef}
+        tabIndex={-1}
+        className="relative rounded-lg shadow-xl w-full max-w-2xl mx-4 outline-none" 
         style={{ 
           backgroundColor: 'var(--bg-primary)',
           color: 'var(--text-primary)' 

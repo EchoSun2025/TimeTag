@@ -15,7 +15,7 @@ function createMainWindow() {
     minWidth: 1200,
     minHeight: 700,
     frame: true,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#0f0f14', // Dark background color
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -39,11 +39,27 @@ function createMainWindow() {
 }
 
 function createMiniWindow() {
+  // Get all displays
+  const { screen } = require('electron');
+  const displays = screen.getAllDisplays();
+  
+  // Position for mini window
+  let x = 20;
+  let y = 20;
+  
+  // If there are multiple displays, use the second one
+  if (displays.length > 1) {
+    // Find a display that's not the primary one
+    const secondaryDisplay = displays.find(d => !d.bounds.x === 0 && !d.bounds.y === 0) || displays[1];
+    x = secondaryDisplay.bounds.x + 20;
+    y = secondaryDisplay.bounds.y + 20;
+  }
+  
   miniWindow = new BrowserWindow({
     width: 252,
-    height: 45,  // Reduced to 45px for ultra-compact size
-    x: 20,  // Position at left
-    y: 20,  // Position at top
+    height: 32,  // 45 * 0.7 ≈ 32px
+    x,
+    y,
     frame: false,
     transparent: true,
     alwaysOnTop: true,

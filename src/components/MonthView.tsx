@@ -157,12 +157,6 @@ function MonthView({ currentDate }: MonthViewProps) {
         <div className="grid grid-cols-7 gap-1">
           {monthStats.days.map((dayStat, index) => {
             const dayTime = formatMinutesToHM(dayStat.minutes);
-            const intensity = maxMinutes > 0 ? dayStat.minutes / maxMinutes : 0;
-            const bgColor = dayStat.topTag
-              ? `rgba(${parseInt(dayStat.topTag.color.slice(1, 3), 16)}, ${parseInt(dayStat.topTag.color.slice(3, 5), 16)}, ${parseInt(dayStat.topTag.color.slice(5, 7), 16)}, ${0.2 + intensity * 0.6})`
-              : dayStat.minutes > 0
-              ? `rgba(156, 163, 175, ${0.2 + intensity * 0.4})`
-              : undefined;
 
             return (
               <div
@@ -173,7 +167,7 @@ function MonthView({ currentDate }: MonthViewProps) {
                   ${dayStat.isCurrentMonth ? '' : 'opacity-40'}
                 `}
                 style={{ 
-                  backgroundColor: bgColor,
+                  backgroundColor: 'var(--bg-secondary)',
                   borderWidth: '1px',
                   borderColor: dayStat.isCurrentMonth ? 'var(--border-color)' : 'var(--bg-tertiary)'
                 }}

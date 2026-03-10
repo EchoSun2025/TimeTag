@@ -50,7 +50,7 @@ export const useAppStore = create<AppState>()(
       settings: null,
       showWeekExpanded: false,
       isMiniMode: false,
-      isDarkMode: false,
+      isDarkMode: true, // Default to dark mode
       
       // Date navigation
       setCurrentDate: (date) => set({ currentDate: date }),
