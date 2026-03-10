@@ -167,7 +167,7 @@ const TagEditor = React.memo(({
         <textarea
           value={editSubItems}
           onChange={(e) => setEditSubItems(e.target.value)}
-          placeholder="e.g., for 'Work' tag:&#10;Can's work&#10;FX work&#10;Art work"
+          placeholder="e.g., for 'Work' tag:&#10;Project A&#10;Project B&#10;Meeting"
           rows={6}
           className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
           style={{

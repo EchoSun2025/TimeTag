@@ -121,8 +121,8 @@ export async function initializeDefaultTags() {
   if (existingTags.length === 0) {
     const defaultTags: Omit<Tag, 'id'>[] = [
       { name: 'Work', color: '#4285F4', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
+      { name: 'Study', color: '#FBBC04', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
       { name: 'Lunch', color: '#34A853', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
-      { name: 'Meeting', color: '#EA4335', isActive: true, isLeisure: false, subItems: [], recurringSchedules: [], createdAt: new Date() },
     ];
 
     for (const tag of defaultTags) {
