@@ -67,7 +67,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "icon3.png",
+      "icon": "icon.png",
       "artifactName": "${productName}-${version}-Portable.${ext}",
       "signAndEditExecutable": false
     },
@@ -78,7 +78,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "icon3.png",
+      "icon": "icon.png",
       "category": "Utility",
       "artifactName": "${productName}-${version}.${ext}"
     }
