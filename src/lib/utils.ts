@@ -46,7 +46,7 @@ export function formatWeekRange(date: Date): string {
   const end = endOfWeek(date, { weekStartsOn: 1 });
   const weekNumber = Math.ceil(start.getDate() / 7);
   
-  return `${format(start, 'MM/dd')}-${format(end, 'MM/dd')} ${format(date, 'MMM')}.Week${weekNumber}`;
+  return `${format(start, 'dd/MM')}-${format(end, 'dd/MM')} ${format(date, 'MMM')} Week ${weekNumber}`;
 }
 
 /**

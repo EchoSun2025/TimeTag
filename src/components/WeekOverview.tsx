@@ -190,8 +190,8 @@ function WeekOverview() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Week navigation */}
-      <div className="flex items-center gap-4 mb-6">
+      {/* Week navigation and view mode buttons */}
+      <div className="flex items-center gap-4 mb-4">
         {/* Week date navigation with background card */}
         <div className="rounded-lg px-6 py-4 flex items-center gap-4" style={{
           backgroundColor: 'var(--accent-bg)',
@@ -236,6 +236,18 @@ function WeekOverview() {
             This Week
           </button>
           <button
+            onClick={() => setViewMode('week')}
+            className="px-6 py-2.5 text-base transition-colors"
+            style={{
+              color: 'var(--text-primary)',
+              borderRight: `1px solid var(--accent-border)`
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+          >
+            Week
+          </button>
+          <button
             onClick={() => setViewMode('month')}
             className="px-6 py-2.5 text-base transition-colors"
             style={{ color: 'var(--text-primary)' }}
@@ -245,8 +257,10 @@ function WeekOverview() {
             Month
           </button>
         </div>
+      </div>
 
-        {/* Week total card with tag breakdown */}
+      {/* Week total card with tag breakdown - separate row */}
+      <div className="mb-6">
         <div className="rounded-lg p-4 flex items-center gap-6" style={{
           backgroundColor: 'var(--accent-bg)',
           borderWidth: '1px',
