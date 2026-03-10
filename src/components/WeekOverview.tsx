@@ -7,13 +7,13 @@ import { calculateDayStats, getDayTimeRange, formatMinutesToHM } from '@/lib/sta
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import MonthView from './MonthView';
 
-type ViewMode = '5days' | '7days' | 'month';
+type ViewMode = 'week' | 'month';
 
 function WeekOverview() {
   const { currentDate, showWeekExpanded, setShowWeekExpanded } = useAppStore();
-  const [viewMode, setViewMode] = useState<ViewMode>('5days');
+  const [viewMode, setViewMode] = useState<ViewMode>('week');
   
-  const weekDaysCount = viewMode === '5days' ? 5 : viewMode === '7days' ? 7 : 7;
+  const weekDaysCount = 7; // Always show 7 days
 
   const weekDays = getWeekDays(currentDate, weekDaysCount);
 
@@ -62,14 +62,6 @@ function WeekOverview() {
       days: dayStats,
     };
   }, [weekRecords, tags, weekDays]);
-
-  const toggleWeekDays = () => {
-    if (viewMode === '5days') {
-      setViewMode('7days');
-    } else {
-      setViewMode('5days');
-    }
-  };
 
   const jumpToThisWeek = () => {
     useAppStore.getState().setCurrentDate(new Date());
@@ -147,18 +139,6 @@ function WeekOverview() {
               onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               This Week
-            </button>
-            <button
-              onClick={toggleWeekDays}
-              className="px-6 py-2.5 text-base transition-colors"
-              style={{
-                color: 'var(--text-primary)',
-                borderRight: `1px solid var(--accent-border)`
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              {viewMode === '5days' ? '7 Days' : '5 Days'}
             </button>
             <button
               onClick={() => setViewMode('month')}
