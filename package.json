@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
     "build:win": "npm run build:renderer && npm run build:electron && electron-builder --win portable",
-    "build:linux": "npm run build:renderer && npm run build:electron && electron-builder --linux AppImage",
+    "build:linux": "npm run build:renderer && npm run build:electron && electron-builder --linux tar.gz",
     "build:all": "npm run build:renderer && npm run build:electron && electron-builder --win portable --linux AppImage",
     "build:renderer": "vite build",
     "build:electron": "tsc -p tsconfig.electron.json",
@@ -74,7 +74,7 @@
     "linux": {
       "target": [
         {
-          "target": "AppImage",
+          "target": "tar.gz",
           "arch": ["x64"]
         }
       ],
