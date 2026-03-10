@@ -18,6 +18,10 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
   const [focusedTagIndex, setFocusedTagIndex] = useState(-1);
   const [currentSubItemIndex, setCurrentSubItemIndex] = useState(0);
   
+  // Time input states (only for editing)
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  
   const descriptionRef = React.useRef<HTMLInputElement>(null);
   const tagsContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -30,12 +34,24 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       setDescription(editRecord.description);
       setSelectedTags(editRecord.tags);
       setFocusedTagIndex(-1);
+      
+      // Format times for input fields (HH:mm format)
+      const formatTimeForInput = (date: Date) => {
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+      };
+      
+      setStartTime(formatTimeForInput(new Date(editRecord.startTime)));
+      setEndTime(formatTimeForInput(new Date(editRecord.endTime)));
     } else if (isOpen) {
       // Reset for new record
       setDescription('');
       setSelectedTags([]);
       setCurrentSubItemIndex(0);
       setFocusedTagIndex(-1);
+      setStartTime('');
+      setEndTime('');
     }
   }, [editRecord, isOpen]);
 
@@ -77,15 +93,26 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
 
   const handleSave = async () => {
     if (editRecord) {
-      // Update existing record
+      // Update existing record with new times if they were edited
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+      const [endHour, endMinute] = endTime.split(':').map(Number);
+      
+      const newStartTime = new Date(editRecord.startTime);
+      newStartTime.setHours(startHour, startMinute, 0, 0);
+      
+      const newEndTime = new Date(editRecord.endTime);
+      newEndTime.setHours(endHour, endMinute, 0, 0);
+      
       await db.records.update(editRecord.id, {
         description: description.trim() || 'Untitled',
         tags: selectedTags,
+        startTime: newStartTime,
+        endTime: newEndTime,
         updatedAt: new Date(),
       });
       handleClose();
     } else if (onStartRecording) {
-      // Start new recording
+      // Start new recording (no time input for new records)
       onStartRecording(description.trim() || 'Untitled', selectedTags);
       
       // Save description to tag's sub-items if not empty and not already exists
@@ -274,6 +301,44 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
 
         {/* Body */}
         <div className="px-6 py-4 space-y-4">
+          {/* Time inputs - Only show when editing */}
+          {editRecord && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                  Start Time
+                </label>
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                  End Time
+                </label>
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          
           {/* Tags - Top Priority */}
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
