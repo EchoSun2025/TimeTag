@@ -224,18 +224,6 @@ function WeekOverview() {
             This Week
           </button>
           <button
-            onClick={toggleWeekDays}
-            className="px-6 py-2.5 text-base transition-colors"
-            style={{
-              color: 'var(--text-primary)',
-              borderRight: `1px solid var(--accent-border)`
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-          >
-            {viewMode === '5days' ? '7 Days' : '5 Days'}
-          </button>
-          <button
             onClick={() => setViewMode('month')}
             className="px-6 py-2.5 text-base transition-colors"
             style={{ color: 'var(--text-primary)' }}
