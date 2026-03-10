@@ -2,13 +2,15 @@ import { TimeRecord } from '@/types';
 
 /**
  * Detect overlapping records and assign columns for side-by-side display
- * Also treats records within 10 minutes of each other as "overlapping" for better visual separation
+ * Records smaller than 15 minutes within 10 minutes gap are treated as overlapping
+ * Records larger than 15 minutes only split into columns if they truly overlap
  * Earlier records are placed in left columns
  */
 export function calculateOverlappingLayout(records: TimeRecord[]) {
   if (records.length === 0) return [];
 
   const TEN_MINUTES_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
+  const FIFTEEN_MINUTES_MS = 15 * 60 * 1000; // 15 minutes threshold
 
   // Sort by start time (earlier first)
   const sorted = [...records].sort((a, b) => 
@@ -29,6 +31,7 @@ export function calculateOverlappingLayout(records: TimeRecord[]) {
     const current = recordsWithLayout[i];
     const currentStart = new Date(current.startTime).getTime();
     const currentEnd = new Date(current.endTime).getTime();
+    const currentDuration = currentEnd - currentStart;
 
     // Find which group this record belongs to
     let belongsToGroup = -1;
@@ -41,8 +44,16 @@ export function calculateOverlappingLayout(records: TimeRecord[]) {
         const other = recordsWithLayout[idx];
         const otherStart = new Date(other.startTime).getTime();
         const otherEnd = new Date(other.endTime).getTime();
+        const otherDuration = otherEnd - otherStart;
         
         const hasOverlap = !(otherEnd <= currentStart || otherStart >= currentEnd);
+        
+        // For records > 15 min, only group if they truly overlap
+        if (currentDuration > FIFTEEN_MINUTES_MS && otherDuration > FIFTEEN_MINUTES_MS) {
+          return hasOverlap;
+        }
+        
+        // For small records (≤ 15 min), also consider close-by as overlapping
         const gap = Math.min(
           Math.abs(currentStart - otherEnd),
           Math.abs(otherStart - currentEnd)

@@ -42,6 +42,7 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
   
   const top = (startMinutes / 60) * heightPerHour;
   // Force minimum 15 minutes display height for better button visibility
+  // Small blocks extend into the future only (not into the past)
   const displayDurationMinutes = Math.max(durationMinutes, 15);
   const height = Math.max((displayDurationMinutes / 60) * heightPerHour, 20); // Minimum 20px
   

@@ -139,7 +139,7 @@ function WeekOverview() {
               onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
               onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
-              This Week
+              Current
             </button>
             <button
               onClick={() => setViewMode('week')}
@@ -238,7 +238,7 @@ function WeekOverview() {
             onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
-            This Week
+            Current
           </button>
           <button
             onClick={() => setViewMode('week')}
