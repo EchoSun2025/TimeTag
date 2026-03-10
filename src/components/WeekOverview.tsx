@@ -141,6 +141,18 @@ function WeekOverview() {
               This Week
             </button>
             <button
+              onClick={() => setViewMode('week')}
+              className="px-6 py-2.5 text-base transition-colors"
+              style={{
+                color: 'var(--text-primary)',
+                borderRight: `1px solid var(--accent-border)`
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              Week
+            </button>
+            <button
               onClick={() => setViewMode('month')}
               className="px-6 py-2.5 text-base transition-colors"
               style={{ color: 'var(--text-primary)' }}
@@ -254,6 +266,7 @@ function WeekOverview() {
                     className="w-3 h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: tag.color }}
                   />
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{tag.name}</span>
                   <span className="font-mono text-base" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
                 </div>
               ))}

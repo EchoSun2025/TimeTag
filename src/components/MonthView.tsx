@@ -133,6 +133,7 @@ function MonthView({ currentDate }: MonthViewProps) {
                     className="w-3 h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: tag.color }}
                   />
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{tag.name}</span>
                   <span className="font-mono text-base" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
                 </div>
               ))}
@@ -141,19 +142,19 @@ function MonthView({ currentDate }: MonthViewProps) {
         </div>
       </div>
 
-      {/* Calendar grid */}
-      <div className="flex-1 overflow-auto">
+      {/* Calendar grid - fixed height to avoid scrollbar */}
+      <div className="flex-1">
         {/* Weekday headers */}
-        <div className="grid grid-cols-7 gap-2 mb-2">
+        <div className="grid grid-cols-7 gap-1 mb-1">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-            <div key={day} className="text-center text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+            <div key={day} className="text-center text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
               {day}
             </div>
           ))}
         </div>
 
-        {/* Calendar days */}
-        <div className="grid grid-cols-7 gap-2">
+        {/* Calendar days - compact grid */}
+        <div className="grid grid-cols-7 gap-1">
           {monthStats.days.map((dayStat, index) => {
             const dayTime = formatMinutesToHM(dayStat.minutes);
             const intensity = maxMinutes > 0 ? dayStat.minutes / maxMinutes : 0;
@@ -167,7 +168,7 @@ function MonthView({ currentDate }: MonthViewProps) {
               <div
                 key={index}
                 className={`
-                  rounded p-2 min-h-20
+                  rounded p-1 min-h-12
                   ${dayStat.minutes > 0 ? 'cursor-pointer hover:ring-2 hover:ring-blue-300' : ''}
                   ${dayStat.isCurrentMonth ? '' : 'opacity-40'}
                 `}
@@ -178,7 +179,7 @@ function MonthView({ currentDate }: MonthViewProps) {
                 }}
                 title={`${format(dayStat.date, 'MMM dd')}: ${dayTime.hours}h ${dayTime.minutes}m`}
               >
-                <div className="text-lg font-semibold mb-1" style={{ 
+                <div className="text-sm font-semibold mb-0.5" style={{ 
                   color: dayStat.isCurrentMonth ? 'var(--text-primary)' : 'var(--text-muted)' 
                 }}>
                   {format(dayStat.date, 'd')}
