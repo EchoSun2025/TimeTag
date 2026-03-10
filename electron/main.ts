@@ -10,8 +10,8 @@ const isDev = !app.isPackaged;
 function createMainWindow() {
   // Set icon path (works in both dev and production)
   const iconPath = isDev 
-    ? path.join(__dirname, '../icon2.png')
-    : path.join(process.resourcesPath, 'icon2.png');
+    ? path.join(__dirname, '../icon3.png')
+    : path.join(process.resourcesPath, 'icon3.png');
 
   mainWindow = new BrowserWindow({
     width: 1400,

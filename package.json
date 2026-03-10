@@ -58,7 +58,7 @@
     "files": [
       "dist-electron/**/*",
       "dist/**/*",
-      "icon2.png"
+      "icon3.png"
     ],
     "win": {
       "target": [
@@ -67,7 +67,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "icon2.png",
+      "icon": "icon3.png",
       "artifactName": "${productName}-${version}-Portable.${ext}",
       "signAndEditExecutable": false
     },
@@ -78,7 +78,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "icon2.png",
+      "icon": "icon3.png",
       "category": "Utility",
       "artifactName": "${productName}-${version}.${ext}"
     }
