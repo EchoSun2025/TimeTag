@@ -8,6 +8,11 @@ let miniWindow: BrowserWindow | null = null;
 const isDev = !app.isPackaged;
 
 function createMainWindow() {
+  // Set icon path (works in both dev and production)
+  const iconPath = isDev 
+    ? path.join(__dirname, '../icon2.png')
+    : path.join(process.resourcesPath, 'icon2.png');
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -15,6 +20,7 @@ function createMainWindow() {
     minHeight: 700,
     frame: true,
     backgroundColor: '#0f0f14', // Dark background color
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
