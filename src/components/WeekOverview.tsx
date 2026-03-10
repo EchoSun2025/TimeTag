@@ -97,11 +97,12 @@ function WeekOverview() {
       <div className="flex flex-col h-full">
         {/* Month navigation */}
         <div className="flex items-center gap-4 mb-6">
-          {/* Month date navigation */}
+          {/* Month date navigation - fixed width to match week view */}
           <div className="rounded-lg px-6 py-4 flex items-center gap-4" style={{
             backgroundColor: 'var(--accent-bg)',
             borderWidth: '1px',
-            borderColor: 'var(--accent-border)'
+            borderColor: 'var(--accent-border)',
+            minWidth: '420px'
           }}>
             <button
               onClick={handlePrevPeriod}
@@ -110,7 +111,7 @@ function WeekOverview() {
               &lt;
             </button>
             
-            <div className="text-xl font-sans font-bold">
+            <div className="text-xl font-sans font-bold flex-1 text-center">
               {format(currentDate, 'yyyy MMM')}
             </div>
             
