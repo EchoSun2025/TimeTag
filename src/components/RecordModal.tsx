@@ -7,10 +7,12 @@ interface RecordModalProps {
   isOpen: boolean;
   onClose: () => void;
   editRecord?: TimeRecord;
+  initialStartTime?: Date;
+  initialEndTime?: Date;
   onStartRecording?: (description: string, tags: string[]) => void;
 }
 
-function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordModalProps) {
+function RecordModal({ isOpen, onClose, editRecord, initialStartTime, initialEndTime, onStartRecording }: RecordModalProps) {
   const tags = useLiveQuery(() => db.tags.toArray(), []);
   
   const [description, setDescription] = useState('');
@@ -59,10 +61,22 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
       setSelectedTags([]);
       setCurrentSubItemIndex(0);
       setFocusedTagIndex(-1);
-      setStartTime('');
-      setEndTime('');
+      
+      // Set initial times if provided (from timeline double-click)
+      if (initialStartTime && initialEndTime) {
+        const formatTimeForInput = (date: Date) => {
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          return `${hours}:${minutes}`;
+        };
+        setStartTime(formatTimeForInput(initialStartTime));
+        setEndTime(formatTimeForInput(initialEndTime));
+      } else {
+        setStartTime('');
+        setEndTime('');
+      }
     }
-  }, [editRecord, isOpen]);
+  }, [editRecord, isOpen, initialStartTime, initialEndTime]);
 
   // Auto-select first tag for new records
   useEffect(() => {
@@ -120,8 +134,40 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
         updatedAt: new Date(),
       });
       handleClose();
+    } else if (startTime && endTime) {
+      // Create new record with specified times (from timeline double-click)
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+      const [endHour, endMinute] = endTime.split(':').map(Number);
+      
+      const newStartTime = new Date(initialStartTime || new Date());
+      newStartTime.setHours(startHour, startMinute, 0, 0);
+      
+      const newEndTime = new Date(initialEndTime || new Date());
+      newEndTime.setHours(endHour, endMinute, 0, 0);
+      
+      await db.records.add({
+        id: crypto.randomUUID(),
+        description: description.trim() || 'Untitled',
+        tags: selectedTags,
+        startTime: newStartTime,
+        endTime: newEndTime,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      
+      // Save description to tag's sub-items if not empty and not already exists
+      if (description.trim() && selectedTags.length > 0) {
+        const tag = tags?.find(t => t.id === selectedTags[0]);
+        if (tag && !tag.subItems.includes(description.trim())) {
+          await db.tags.update(tag.id, {
+            subItems: [description.trim(), ...tag.subItems],
+          });
+        }
+      }
+      
+      handleClose();
     } else if (onStartRecording) {
-      // Start new recording (no time input for new records)
+      // Start new recording (no time input, triggered by Alt+X)
       onStartRecording(description.trim() || 'Untitled', selectedTags);
       
       // Save description to tag's sub-items if not empty and not already exists
@@ -313,8 +359,8 @@ function RecordModal({ isOpen, onClose, editRecord, onStartRecording }: RecordMo
 
         {/* Body */}
         <div className="px-6 py-4 space-y-4">
-          {/* Time inputs - Only show when editing */}
-          {editRecord && (
+          {/* Time inputs - Show when editing OR when creating with initial times */}
+          {(editRecord || (startTime && endTime)) && (
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
