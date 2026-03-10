@@ -330,10 +330,13 @@ function WeekOverview() {
                       </div>
                     )}
 
-                    {/* Breaks - same style as Total */}
+                    {/* Breaks - red × symbol */}
                     {dayStats.breaks.map((brk, i) => (
-                      <div key={i} className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>
-                        break {format(brk.startTime, 'h:mma').toLowerCase()}-{format(brk.endTime, 'h:mma').toLowerCase()}
+                      <div key={i} className="text-xs mb-1 flex items-center gap-1">
+                        <span style={{ color: '#ef4444', fontWeight: 'bold' }}>×</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          {format(brk.startTime, 'h:mma').toLowerCase()}-{format(brk.endTime, 'h:mma').toLowerCase()}
+                        </span>
                       </div>
                     ))}
 
@@ -344,16 +347,16 @@ function WeekOverview() {
                       </div>
                     )}
 
-                    {/* Tag breakdown with colored dots and names */}
-                    <div className="space-y-1 mb-3">
+                    {/* Tag breakdown - compact single line */}
+                    <div className="space-y-0.5 mb-3">
                       {dayTagBreakdown.map((tag, i) => (
-                        <div key={i} className="flex items-center gap-2 text-sm">
+                        <div key={i} className="flex items-center gap-1 text-xs">
                           <div 
-                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            className="w-2 h-2 rounded-full flex-shrink-0"
                             style={{ backgroundColor: tag.color }}
                           />
-                          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{tag.name}</span>
-                          <span className="font-mono" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
+                          <span className="text-xs" style={{ color: 'var(--text-primary)' }}>{tag.name}</span>
+                          <span className="font-mono text-xs" style={{ color: 'var(--text-primary)' }}>{tag.hours}h {tag.minutes}m</span>
                         </div>
                       ))}
                     </div>
