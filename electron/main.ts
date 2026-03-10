@@ -1,10 +1,9 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, Tray, Menu } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron';
 import path from 'path';
 
 // Keep a global reference to prevent garbage collection
 let mainWindow: BrowserWindow | null = null;
 let miniWindow: BrowserWindow | null = null;
-let tray: Tray | null = null;
 
 const isDev = !app.isPackaged;
 
@@ -112,15 +111,9 @@ function registerGlobalShortcuts() {
   });
 }
 
-function createTray() {
-  // Tray icon functionality can be added later
-  // For now, just a placeholder
-}
-
 app.whenReady().then(() => {
   createMainWindow();
   registerGlobalShortcuts();
-  createTray();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
