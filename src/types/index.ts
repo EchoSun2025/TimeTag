@@ -8,9 +8,6 @@ export interface TimeRecord {
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
-  // Store original times for 15min rounding toggle
-  originalStartTime?: Date;
-  originalEndTime?: Date;
 }
 
 export interface ActiveRecord {
@@ -40,7 +37,6 @@ export interface Tag {
 }
 
 export interface Settings {
-  timeRounding: boolean; // 15-minute rounding
   roundingInterval: number; // Default 15 minutes
   defaultStartHour: number; // Default 8 (8am)
   defaultEndHour: number; // Default 21 (9pm)

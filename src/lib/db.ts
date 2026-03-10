@@ -99,7 +99,6 @@ export async function initializeDefaultSettings() {
   const existingSettings = await db.settings.toArray();
   if (existingSettings.length === 0) {
     await db.settings.add({
-      timeRounding: false,
       roundingInterval: 15,
       defaultStartHour: 8,
       defaultEndHour: 21,

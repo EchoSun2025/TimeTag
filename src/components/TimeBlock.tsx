@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { TimeRecord, Tag } from '@/types';
-import { formatTime, roundTimeDown, roundTimeUp } from '@/lib/utils';
+import { formatTime } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { useAppStore } from '@/stores/appStore';
 
@@ -26,7 +26,7 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
   const initialEndTime = useRef(0);
   const hasDragged = useRef(false);
   
-  const { settings, startRecording } = useAppStore();
+  const { startRecording } = useAppStore();
 
   // Check if this record was auto-generated from a recurring schedule
   // (by checking if description matches a tag name)
@@ -105,19 +105,10 @@ function TimeBlock({ record, tags, heightPerHour, dayStart, onEdit, column = 0, 
       newStartTime = Math.max(dayStart, Math.min(newStartTime, dayEnd));
       newEndTime = Math.max(dayStart, Math.min(newEndTime, dayEnd));
 
-      // Apply 15-minute rounding if enabled (start DOWN, end UP to preserve duration)
-      let finalStartTime = new Date(newStartTime);
-      let finalEndTime = new Date(newEndTime);
-      
-      if (settings?.timeRounding) {
-        finalStartTime = roundTimeDown(finalStartTime, 15);
-        finalEndTime = roundTimeUp(finalEndTime, 15);
-      }
-
       // Update database
       db.records.update(record.id, {
-        startTime: finalStartTime,
-        endTime: finalEndTime,
+        startTime: new Date(newStartTime),
+        endTime: new Date(newEndTime),
         updatedAt: new Date(),
       });
     };

@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { roundTimeDown, roundTimeUp } from '@/lib/utils';
 import { useAppStore } from '@/stores/appStore';
 import SettingsPage from './SettingsPage';
 
 function TopBar() {
-  const [isRounding, setIsRounding] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { activeRecord, stopRecording, startRecording, currentDate, isDarkMode, setDarkMode, updateSettings } = useAppStore();
+  const { activeRecord, stopRecording, startRecording, currentDate, isDarkMode, setDarkMode } = useAppStore();
   
   // Get today's records to find the most recent one
   const todayRecords = useLiveQuery(async () => {
@@ -36,74 +34,6 @@ function TopBar() {
   // Display active record or latest completed record
   const displayRecord = activeRecord || latestRecord;
   const tag = displayRecord && tags?.find(t => t.id === displayRecord.tags[0]);
-
-  const handleToggleRounding = async () => {
-    const newState = !isRounding;
-    setIsRounding(newState);
-
-    if (newState) {
-      // Turning ON: Apply rounding and save original times
-      const allRecords = await db.records.toArray();
-      console.log('🔄 Enabling 15min round for', allRecords.length, 'records');
-      
-      for (const record of allRecords) {
-        const currentStart = new Date(record.startTime);
-        const currentEnd = new Date(record.endTime);
-        // Round start DOWN and end UP to ensure no time is lost
-        const roundedStart = roundTimeDown(currentStart, 15);
-        const roundedEnd = roundTimeUp(currentEnd, 15);
-        
-        // Only save original times if not already saved
-        const updates: any = {
-          startTime: roundedStart,
-          endTime: roundedEnd,
-          updatedAt: new Date(),
-        };
-        
-        // Save original times only if they don't exist yet
-        if (!record.originalStartTime || !record.originalEndTime) {
-          updates.originalStartTime = currentStart;
-          updates.originalEndTime = currentEnd;
-          console.log('💾 Saving original times for record:', record.id, {
-            original: { start: currentStart, end: currentEnd },
-            rounded: { start: roundedStart, end: roundedEnd }
-          });
-        } else {
-          console.log('✓ Original times already saved for record:', record.id);
-        }
-        
-        await db.records.update(record.id, updates);
-      }
-    } else {
-      // Turning OFF: Restore original times and clear them
-      const allRecords = await db.records.toArray();
-      console.log('🔙 Disabling 15min round, restoring', allRecords.length, 'records');
-      
-      for (const record of allRecords) {
-        // Restore from original times if available
-        if (record.originalStartTime && record.originalEndTime) {
-          await db.records.update(record.id, {
-            startTime: new Date(record.originalStartTime),
-            endTime: new Date(record.originalEndTime),
-            // Clear original times so they can be re-saved correctly next time
-            originalStartTime: null,
-            originalEndTime: null,
-            updatedAt: new Date(),
-          });
-          console.log('✅ Restored and cleared original times for record:', record.id, {
-            from: { start: record.startTime, end: record.endTime },
-            to: { start: record.originalStartTime, end: record.originalEndTime }
-          });
-        } else {
-          console.log('⚠️ No original times found for record:', record.id);
-        }
-      }
-    }
-
-    // Update settings in both database and appStore
-    await updateSettings({ timeRounding: newState });
-    console.log('⚙️ Updated settings: timeRounding =', newState);
-  };
 
   const handleContinue = () => {
     if (latestRecord) {
@@ -170,22 +100,6 @@ function TopBar() {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-3">
-        {/* 15min Round button */}
-        <button
-          onClick={handleToggleRounding}
-          className={`px-4 py-2 text-sm border rounded-full transition-colors ${
-            isRounding
-              ? 'bg-yellow-100 border-yellow-300 text-gray-900 dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-200'
-              : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-          }`}
-          style={{ 
-            borderColor: isRounding ? undefined : 'var(--border-color)',
-            color: isRounding ? undefined : 'var(--text-primary)'
-          }}
-        >
-          15min Round {isRounding ? 'ON' : 'OFF'}
-        </button>
-
         {/* Dark mode toggle button */}
         <button
           onClick={() => setDarkMode(!isDarkMode)}
